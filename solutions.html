@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solutions Python - Accès autorisé</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Vérification d'accès */
+    #access-check {
+      display: none;
+    }
+
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      color: #38bdf8;
+    }
+
+    .logout-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .logout-btn:hover {
+      background: #475569;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .welcome {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .welcome h2 {
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .chapter {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .chapter-header {
+      background: #0f172a;
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+
+    .chapter-header h3 {
+      font-size: 1.1rem;
+      color: #f1f5f9;
+    }
+
+    .chapter-header span {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .chapter-content {
+      padding: 20px;
+      display: none;
+    }
+
+    .chapter-content.active {
+      display: block;
+    }
+
+    .exercice {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .exercice:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .exercice h4 {
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+    }
+
+    .exercice p {
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+
+    pre {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .explication {
+      background: #0f172a;
+      border-left: 4px solid #0ea5e9;
+      padding: 14px 16px;
+      margin-top: 12px;
+      border-radius: 0 8px 8px 0;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vérification d'accès immédiate -->
+  <script>
+    // Protection de la page
+    if (localStorage.getItem('access_granted') !== 'true') {
+      window.location.href = '/index.html';
+    }
+  </script>
+
+  <header>
+    <h1>Solutions Python</h1>
+    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+  </header>
+
+  <div class="container">
+
+    <div class="welcome">
+      <h2>Bienvenue</h2>
+      <p>Vous avez accès à toutes les solutions et explications du parascolaire.</p>
+    </div>
+
+    <!-- Chapitre 1 -->
+    <div class="chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <h3>Chapitre 1 — Les bases de Python</h3>
+        <span>▼</span>
+      </div>
+      <div class="chapter-content">
+
+        <div class="exercice">
+          <h4>Exercice 1.1</h4>
+          <p>Écrire un programme qui affiche "Bonjour le monde".</p>
+          <pre>print("Bonjour le monde")</pre>
+          <div class="explication">
+            La fonction <code>print()</code> permet d'afficher du texte à l'écran.
+          </div>
+        </div>
+
+        <div class="exercice">
+          <h4>Exercice 1.2</h4>
+          <p>Demander le nom de l'utilisateur et l'afficher.</p>
+          <pre>nom = input("Quel est ton nom ? ")
+print("Bonjour", nom)</pre>
+          <div class="explication">
+            <code>input()</code> permet de récupérer ce que l'utilisateur tape au clavier.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Chapitre 2 -->
+    <div class="chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <h3>Chapitre 2 — Les variables et types</h3>
+        <span>▼</span>
+      </div>
+      <div class="chapter-content">
+
+        <div class="exercice">
+          <h4>Exercice 2.1</h4>
+          <p>Créer deux variables et afficher leur somme.</p>
+          <pre>a = 15
+b = 27
+print(a + b)</pre>
+          <div class="explication">
+            On peut faire des calculs directement avec les variables.
+          </div>
+        </div>
+
+        <div class="exercice">
+          <h4>Exercice 2.2</h4>
+          <p>Convertir une chaîne en nombre entier.</p>
+          <pre>texte = "42"
+nombre = int(texte)
+print(nombre + 8)</pre>
+          <div class="explication">
+            <code>int()</code> convertit une chaîne de caractères en nombre entier.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Chapitre 3 -->
+    <div class="chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <h3>Chapitre 3 — Les conditions</h3>
+        <span>▼</span>
+      </div>
+      <div class="chapter-content">
+
+        <div class="exercice">
+          <h4>Exercice 3.1</h4>
+          <p>Vérifier si un nombre est positif, négatif ou nul.</p>
+          <pre>n = int(input("Entrez un nombre : "))
+
+if n > 0:
+    print("Positif")
+elif n < 0:
+    print("Négatif")
+else:
+    print("Nul")</pre>
+          <div class="explication">
+            On utilise <code>if / elif / else</code> pour tester plusieurs conditions.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Contenu réservé aux possesseurs du livre — Tous droits réservés
+  </footer>
+
+  <script>
+    // Ouvrir / fermer les chapitres
+    function toggleChapter(header) {
+      const content = header.nextElementSibling;
+      const arrow = header.querySelector('span');
+
+      content.classList.toggle('active');
+      arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+    }
+
+    // Déconnexion
+    function logout() {
+      localStorage.removeItem('access_granted');
+      localStorage.removeItem('access_code');
+      window.location.href = '/index.html';
+    }
+
+    // Ouvrir le premier chapitre par défaut
+    document.querySelector('.chapter-content').classList.add('active');
+    document.querySelector('.chapter-header span').textContent = '▲';
+  </script>
+</body>
+</html>
