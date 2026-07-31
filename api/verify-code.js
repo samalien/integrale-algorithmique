@@ -6,21 +6,20 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  // Autoriser uniquement les requêtes POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
   try {
-    const { code } = req.body;
+    const { code, device_id } = req.body;
 
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ error: 'Code manquant' });
+    if (!code || !device_id) {
+      return res.status(400).json({ error: 'Code ou device_id manquant' });
     }
 
     const cleanCode = code.trim().toUpperCase();
 
-    // 1. Chercher le code dans Supabase
+    // Chercher le code
     const { data, error } = await supabase
       .from('codes')
       .select('*')
@@ -31,30 +30,32 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Code invalide' });
     }
 
-    // 2. Vérifier s'il a déjà été utilisé
-    if (data.used === true) {
-      return res.status(400).json({ error: 'Code déjà utilisé' });
+    // Cas 1 : le code n'a jamais été utilisé → on l'associe à cette machine
+    if (!data.device_id) {
+      const { error: updateError } = await supabase
+        .from('codes')
+        .update({ 
+          device_id: device_id,
+          used: true,
+          used_at: new Date().toISOString()
+        })
+        .eq('code', cleanCode);
+
+      if (updateError) {
+        return res.status(500).json({ error: 'Erreur serveur' });
+      }
+
+      return res.status(200).json({ success: true, message: 'Code activé sur cette machine' });
     }
 
-    // 3. Marquer le code comme utilisé
-    const { error: updateError } = await supabase
-      .from('codes')
-      .update({ 
-        used: true,
-        used_at: new Date().toISOString()
-      })
-      .eq('code', cleanCode);
-
-    if (updateError) {
-      console.error(updateError);
-      return res.status(500).json({ error: 'Erreur serveur' });
+    // Cas 2 : le code est déjà lié à une machine
+    if (data.device_id === device_id) {
+      // Même machine → accès autorisé
+      return res.status(200).json({ success: true, message: 'Accès autorisé' });
+    } else {
+      // Autre machine → refusé
+      return res.status(403).json({ error: 'Ce code est déjà utilisé sur une autre machine' });
     }
-
-    // 4. Succès
-    return res.status(200).json({ 
-      success: true,
-      message: 'Code valide'
-    });
 
   } catch (err) {
     console.error(err);

@@ -152,62 +152,73 @@
     </div>
   </div>
 
-  <script>
-    const form = document.getElementById('codeForm');
-    const message = document.getElementById('message');
-    const submitBtn = document.getElementById('submitBtn');
+<script>
+  // Générer ou récupérer un identifiant unique de machine
+  function getDeviceId() {
+    let deviceId = localStorage.getItem('device_id');
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      localStorage.setItem('device_id', deviceId);
+    }
+    return deviceId;
+  }
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  const form = document.getElementById('codeForm');
+  const message = document.getElementById('message');
+  const submitBtn = document.getElementById('submitBtn');
 
-      const code = document.getElementById('code').value.trim().toUpperCase();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      if (!code) return;
+    const code = document.getElementById('code').value.trim().toUpperCase();
+    const deviceId = getDeviceId();
 
-      // Réinitialiser le message
-      message.className = 'message';
-      message.style.display = 'none';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Vérification...';
+    if (!code) return;
 
-      try {
-        const response = await fetch('/api/verify-code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code })
-        });
+    message.className = 'message';
+    message.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Vérification...';
 
-        const data = await response.json();
+    try {
+      const response = await fetch('/api/verify-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          code: code,
+          device_id: deviceId
+        })
+      });
 
-        if (response.ok && data.success) {
-          message.className = 'message success';
-          message.textContent = 'Code valide ! Redirection...';
-          message.style.display = 'block';
+      const data = await response.json();
 
-          // Sauvegarder l'accès dans le navigateur
-          localStorage.setItem('access_granted', 'true');
-          localStorage.setItem('access_code', code);
-
-          // Redirection vers la page des solutions
-          setTimeout(() => {
-            window.location.href = '/solutions.html';
-          }, 1200);
-        } else {
-          message.className = 'message error';
-          message.textContent = data.error || 'Code invalide ou déjà utilisé';
-          message.style.display = 'block';
-        }
-      } catch (err) {
-        message.className = 'message error';
-        message.textContent = 'Erreur de connexion. Réessayez.';
+      if (response.ok && data.success) {
+        message.className = 'message success';
+        message.textContent = 'Code valide ! Redirection...';
         message.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Vérifier le code';
+
+        localStorage.setItem('access_granted', 'true');
+        localStorage.setItem('access_code', code);
+
+        setTimeout(() => {
+          window.location.href = '/solutions.html';
+        }, 1200);
+      } else {
+        message.className = 'message error';
+        message.textContent = data.error || 'Code invalide';
+        message.style.display = 'block';
       }
-    });
-  </script>
+    } catch (err) {
+      message.className = 'message error';
+      message.textContent = 'Erreur de connexion. Réessayez.';
+      message.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Vérifier le code';
+    }
+  });
+</script>
 </body>
 </html>

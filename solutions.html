@@ -19,11 +19,6 @@
       min-height: 100vh;
     }
 
-    /* Vérification d'accès */
-    #access-check {
-      display: none;
-    }
-
     header {
       background: #1e293b;
       border-bottom: 1px solid #334155;
@@ -166,10 +161,13 @@
 </head>
 <body>
 
-  <!-- Vérification d'accès immédiate -->
+  <!-- Protection de la page -->
   <script>
-    // Protection de la page
-    if (localStorage.getItem('access_granted') !== 'true') {
+    // Vérifie que l'utilisateur a bien un accès valide sur cette machine
+    const accessGranted = localStorage.getItem('access_granted');
+    const deviceId = localStorage.getItem('device_id');
+
+    if (accessGranted !== 'true' || !deviceId) {
       window.location.href = '/index.html';
     }
   </script>
@@ -294,6 +292,8 @@ else:
 
     // Déconnexion
     function logout() {
+      // On enlève seulement l'accès, on garde le device_id
+      // comme ça la même machine reste reconnue
       localStorage.removeItem('access_granted');
       localStorage.removeItem('access_code');
       window.location.href = '/index.html';
