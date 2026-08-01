@@ -3,305 +3,1072 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solutions Python - Accès autorisé</title>
+  <title>Solutions Python - Espace Réservé</title>
+  
+  <!-- Balise link dynamique pour changer le thème CSS de Prism -->
+  <link id="prism-theme" rel="stylesheet" href="./assets/prism/prism-tomorrownight.min.css" />
+  
+  <!-- Pyodide local -->
+  <script src="./pyodide/pyodide.js"></script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* --- STYLES CSS INTÉGRÉS (css/solutions.css) --- */
+    :root {
+      --bg-main: #0f172a; /* slate-900 */
+      --bg-side: #1e293b; /* slate-800 */
+      --bg-card: #1e293b;
+      --text-main: #f1f5f9; /* slate-100 */
+      --text-muted: #94a3b8; /* slate-400 */
+      --accent: #38bdf8; /* sky-400 */
+      --accent-hover: #7dd3fc; /* sky-300 */
+      --border: #334155; /* slate-700 */
+      --header-h: 60px;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #1e293b;
-      border-bottom: 1px solid #334155;
-      padding: 18px 24px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    header h1 {
-      font-size: 1.3rem;
-      color: #38bdf8;
-    }
-
-    .logout-btn {
-      background: #334155;
-      color: #e2e8f0;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .logout-btn:hover {
-      background: #475569;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-
-    .welcome {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 32px;
-    }
-
-    .welcome h2 {
-      color: #38bdf8;
-      margin-bottom: 8px;
-    }
-
-    .chapter {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      margin-bottom: 24px;
+      flex-direction: column;
       overflow: hidden;
     }
 
-    .chapter-header {
-      background: #0f172a;
-      padding: 16px 20px;
+    /* --- HEADER & FOOTER --- */
+    header {
+      height: var(--header-h);
+      background-color: var(--bg-side);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    header h1 { font-size: 1.2rem; color: var(--accent); }
+
+    footer {
+      height: 30px;
+      background-color: var(--bg-side);
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* --- BOUTONS NAV --- */
+    .nav-btn {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background-color: var(--border); border-color: var(--accent); }
+
+    main { flex: 1; position: relative; width: 100%; overflow: hidden; }
+
+    /* --- VUE 1 : GRILLE DES CHAPITRES --- */
+    #chapters-view {
+      padding: 40px;
+      overflow-y: auto;
+      height: 100%;
+      width: 100%;
+    }
+
+    .welcome { text-align: center; margin-bottom: 40px; }
+    .welcome h2 { font-size: 2rem; margin-bottom: 10px; }
+    .welcome p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+    #chapters-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .chapter-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .chapter-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .chapter-card h3 { font-size: 1.1rem; line-height: 1.4; }
+
+    .badge {
+      font-size: 0.8rem;
+      background-color: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    /* --- VUE 2 : ESPACE DE TRAVAIL (SPLIT SCREEN) --- */
+    #workspace-view {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    #workspace-view.active { transform: translateX(0); }
+
+    /* SIDEBAR (Gauche) */
+    .sidebar {
+      width: 300px;
+      background-color: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 15px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    /* --- ACCORDÉON DES EXERCICES (SIDEBAR) --- */
+    .exercise-accordion {
+      flex: 1;
+      overflow-y: auto; /* Scroll interne */
+      padding: 10px 0;
+    }
+
+    /* En-tête de catégorie (Bouton masquer/afficher) */
+    .accordion-category {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 12px 15px;
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: left;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #334155;
+      border-bottom: 1px solid #1e293b; /* slate-800 */
+      transition: background 0.2s;
     }
 
-    .chapter-header h3 {
-      font-size: 1.1rem;
-      color: #f1f5f9;
+    .accordion-category:hover { background-color: #1e293b; }
+
+    /* Icône flèche */
+    .category-icon {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
     }
 
-    .chapter-header span {
-      color: #94a3b8;
-      font-size: 0.9rem;
+    /* Rotation flèche quand ouvert */
+    .accordion-category.active .category-icon {
+      transform: rotate(180deg);
+      color: var(--accent);
     }
 
-    .chapter-content {
-      padding: 20px;
-      display: none;
+    /* Conteneur des exercices (masqué par défaut) */
+    .accordion-content {
+      max-height: 0; /* Hauteur nulle pour masquer */
+      overflow: hidden; /* Cache le débordement */
+      transition: max-height 0.3s ease-out; /* Animation fluide */
+      background-color: #0f172a; /*slate-900 un peu plus sombre*/
     }
 
-    .chapter-content.active {
-      display: block;
-    }
-
-    .exercice {
-      margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #334155;
-    }
-
-    .exercice:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .exercice h4 {
-      color: #38bdf8;
-      margin-bottom: 10px;
-      font-size: 1.05rem;
-    }
-
-    .exercice p {
-      color: #cbd5e1;
-      margin-bottom: 12px;
-    }
-
-    pre {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 16px;
-      overflow-x: auto;
-      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.9rem;
-      color: #e2e8f0;
-      line-height: 1.5;
-    }
-
-    .explication {
-      background: #0f172a;
-      border-left: 4px solid #0ea5e9;
-      padding: 14px 16px;
-      margin-top: 12px;
-      border-radius: 0 8px 8px 0;
-      color: #94a3b8;
-      font-size: 0.95rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #64748b;
+    /* Style des items exercices à l'intérieur */
+    .accordion-content .exercise-item {
+      padding: 10px 15px 10px 30px; /* Indentation à gauche */
       font-size: 0.85rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s;
     }
+
+    .accordion-content .exercise-item:hover {
+      background-color: #1e293b;
+      color: #fff;
+    }
+
+    /* Style de l'exercice sélectionné */
+    .accordion-content .exercise-item.active {
+      background-color: #1e293b;
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Numéro de l'exercice (ExerciceX) */
+    .ex-number {
+      color: #576b81; /* slate-500 sombre */
+      margin-right: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+
+    /* ZONE DE CONTENU (Droite) */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto; /* Scroll global de la zone droite */
+      background-color: var(--bg-main);
+    }
+
+    /* ÉNONCÉ */
+    .statement-box {
+      padding: 25px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .statement-box h2 { font-size: 1.4rem; margin-bottom: 10px; color: var(--accent); }
+    .statement-box p { color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; }
+
+    /* ÉDITEUR */
+    .editor-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    /* BARRE D'OUTILS ÉDITEUR */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background-color: var(--bg-side);
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      background-color: #334155; /* slate-700 */
+      border: 1px solid transparent;
+      color: var(--text-main);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .tool-btn:hover:not(:disabled) { background-color: #475569; border-color: var(--accent); }
+    .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .run-btn { background-color: #0369a1; font-weight: bold; } /* sky-700 */
+    .run-btn:hover:not(:disabled) { background-color: #0284c7; }
+
+    .pyodide-status { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+
+    /* ZONE DE CODE AVEC CORRECTIF SCROLL */
+    .editor-wrapper {
+      position: relative;
+      height: 350px; /* Hauteur fixe de l'éditeur */
+      border: 1px solid var(--border);
+      border-radius: 0 0 4px 4px;
+      overflow: hidden; /* Empêche le double scroll textarea/pre */
+    }
+
+    /* Le wrapper qui gère le scroll unique pour textarea et pre */
+    .code-scroll-wrapper {
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* Scroll unique ici */
+    }
+
+    #code-input, #code-highlight {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 15px;
+      border: none;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      tab-size: 4;
+      white-space: pre; /* Important pour Prism */
+      overflow: hidden; /* Désactive scroll interne */
+    }
+
+    #code-input {
+      color: transparent;
+      background: transparent;
+      caret-color: var(--accent); /* Couleur du curseur */
+      resize: none;
+      z-index: 2; /* Devant pour la saisie */
+    }
+
+    #code-highlight {
+      z-index: 1; /* Derrière pour la coloration */
+      background-color: #0f172a; /* slate-900 standard */
+    }
+
+    /* CONSOLE DE SORTIE */
+    .console-box {
+      margin-top: 15px;
+      background-color: #000;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+    .console-title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
+    #console-output {
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 150px;
+      overflow-y: auto;
+      min-height: 40px;
+    }
+
+    /* SECTION BASSE (ONGLETS) */
+    .bottom-section {
+      padding: 20px;
+      flex: 1; /* Prend le reste de la hauteur */
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+
+    .tabs { display: flex; gap: 5px; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--accent); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+    .tab-content { display: none; padding: 20px 0; flex: 1; overflow-y: auto;}
+    .tab-content.active { display: block; }
+    .tab-content p { line-height: 1.6; color: #cbd5e1; font-size: 0.9rem;}
   </style>
 </head>
 <body>
 
-  <!-- Protection de la page -->
-  <script>
-    // Vérifie que l'utilisateur a bien un accès valide sur cette machine
-    const accessGranted = localStorage.getItem('access_granted');
-    const deviceId = localStorage.getItem('device_id');
-
-    if (accessGranted !== 'true' || !deviceId) {
-      window.location.href = '/index.html';
-    }
-  </script>
-
   <header>
-    <h1>Solutions Python</h1>
-    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+    <h1>Solutions Python - Espace Interactif</h1>
+    <button class="nav-btn" onclick="logout()">Déconnexion</button>
   </header>
 
-  <div class="container">
-
-    <div class="welcome">
-      <h2>Bienvenue</h2>
-      <p>Vous avez accès à toutes les solutions et explications du parascolaire.</p>
-    </div>
-
-    <!-- Chapitre 1 -->
-    <div class="chapter">
-      <div class="chapter-header" onclick="toggleChapter(this)">
-        <h3>Chapitre 1 — Les bases de Python</h3>
-        <span>▼</span>
+  <main>
+    <!-- VUE 1 : CHAPITRES -->
+    <div id="chapters-view">
+      <div class="welcome">
+        <h2>Bienvenue dans votre Espace Solutions</h2>
+        <p>Sélectionnez un chapitre pour accéder aux exercices. Vous pourrez visualiser les corrigés, lire les explications et exécuter le code Python réel en local grâce à Pyodide (Wasm).</p>
       </div>
-      <div class="chapter-content">
 
-        <div class="exercice">
-          <h4>Exercice 1.1</h4>
-          <p>Écrire un programme qui affiche "Bonjour le monde".</p>
-          <pre>print("Bonjour le monde")</pre>
-          <div class="explication">
-            La fonction <code>print()</code> permet d'afficher du texte à l'écran.
-          </div>
-        </div>
-
-        <div class="exercice">
-          <h4>Exercice 1.2</h4>
-          <p>Demander le nom de l'utilisateur et l'afficher.</p>
-          <pre>nom = input("Quel est ton nom ? ")
-print("Bonjour", nom)</pre>
-          <div class="explication">
-            <code>input()</code> permet de récupérer ce que l'utilisateur tape au clavier.
-          </div>
-        </div>
-
+      <div id="chapters-list">
+          <!-- Rempli dynamiquement par JS -->
       </div>
     </div>
 
-    <!-- Chapitre 2 -->
-    <div class="chapter">
-      <div class="chapter-header" onclick="toggleChapter(this)">
-        <h3>Chapitre 2 — Les variables et types</h3>
-        <span>▼</span>
-      </div>
-      <div class="chapter-content">
+    <!-- VUE 2 : ESPACE DE TRAVAIL (SPLIT SCREEN) -->
+    <div id="workspace-view">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <a class="back-link" onclick="showChaptersList()">← Retour aux chapitres</a>
+          <h3 id="current-chapter-title" style="margin-top: 8px; color:#38bdf8; font-size:0.95rem;">Chapitre</h3>
+        </div>
+        <!-- Menu accordéon dynamique JS -->
+        <div class="exercise-accordion" id="exercise-accordion">
+            <p style="color: #64748b; padding: 15px; font-size:0.85rem;">Chargement des exercices...</p>
+        </div>
+      </aside>
 
-        <div class="exercice">
-          <h4>Exercice 2.1</h4>
-          <p>Créer deux variables et afficher leur somme.</p>
-          <pre>a = 15
-b = 27
-print(a + b)</pre>
-          <div class="explication">
-            On peut faire des calculs directement avec les variables.
+      <section class="content-area">
+        
+        <!-- 1. ÉNONCÉ -->
+        <div class="statement-box">
+          <h2 id="exercise-title">Sélectionnez un exercice</h2>
+          <div id="exercise-body">
+            <p style="color: #64748b;">Choisissez un exercice dans le menu de gauche pour afficher son énoncé, son corrigé et son explication.</p>
           </div>
         </div>
 
-        <div class="exercice">
-          <h4>Exercice 2.2</h4>
-          <p>Convertir une chaîne en nombre entier.</p>
-          <pre>texte = "42"
-nombre = int(texte)
-print(nombre + 8)</pre>
-          <div class="explication">
-            <code>int()</code> convertit une chaîne de caractères en nombre entier.
+        <!-- 2. ÉDITEUR + CONSOLE -->
+        <div class="editor-section">
+          <div class="toolbar">
+            <button id="run-btn" class="tool-btn run-btn" onclick="runPython()" disabled>
+              <span>▶</span> Exécuter le code
+            </button>
+            <span style="color: #334155;">|</span>
+            <button class="tool-btn" onclick="undoCode()">↶ Annuler</button>
+            <button class="tool-btn" onclick="redoCode()">↷ Rétablir</button>
+            <button class="tool-btn" onclick="copyCode()">✂️ Copier</button>
+            <button class="tool-btn" onclick="pasteCode()">📋 Coller</button>
+            <button class="tool-btn" onclick="resetSolution()">🔄 RAZ</button>
+            <span style="color: #334155;">|</span>
+            <label style="color:#94a3b8; font-size:0.8rem;" for="theme-select">🎨 Thème :</label>
+            <select id="theme-select" class="tool-btn" style="padding: 2px 5px;" onchange="changeTheme(this.value)">
+              <option value="tomorrownight">Dark (Tomorrow Night)</option>
+              <option value="okaidia">Monokai (Okaidia)</option>
+              <option value="twilight">Twilight</option>
+              <option value="dark">Dark Standard</option>
+              <option value="default">Clair (Standard)</option>
+              <option value="coy">Coy (Épuré)</option>
+            </select>
+
+            <span class="pyodide-status" id="pyodide-status">⚡ Chargement Python...</span>
+          </div>
+
+          <!-- Zone d'édition avec correctif scroll -->
+          <div class="editor-wrapper">
+            <div class="code-scroll-wrapper">
+                <textarea id="code-input" spellcheck="false" oninput="updateEditor()" onkeydown="handleTab(event)"></textarea>
+                <pre id="code-highlight"><code class="language-python" id="code-block"></code></pre>
+            </div>
+          </div>
+
+          <!-- Console de sortie Python -->
+          <div class="console-box">
+            <div class="console-title">Console de sortie Python (Pyodide Wasm) :</div>
+            <pre id="console-output">Sélectionnez un exercice pour charger le code corrigé.</pre>
           </div>
         </div>
 
-      </div>
+        <!-- 3. SECTION BASSE : EXPLICATION & SIMULATION -->
+        <div class="bottom-section">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('explanation')">💡 Explication de la solution</button>
+            <button class="tab-btn" onclick="switchTab('simulation')">⚙️ Simulation interactive</button>
+          </div>
+
+          <!-- Onglet 1 : Explication -->
+          <div id="tab-explanation" class="tab-content active">
+            <div id="explanation-body">
+              <p style="color: #94a3b8; font-style:italic;">Sélectionnez un exercice pour lire l'explication détaillée du code.</p>
+            </div>
+          </div>
+
+          <!-- Onglet 2 : Simulation -->
+          <div id="tab-simulation" class="tab-content">
+            <div id="simulation-body">
+              <p style="color: #94a3b8; font-style:italic;">Aucune simulation interactive spécifique n'est disponible pour cet exercice. Utilisez l'éditeur de code ci-dessus pour tester des variantes.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
     </div>
-
-    <!-- Chapitre 3 -->
-    <div class="chapter">
-      <div class="chapter-header" onclick="toggleChapter(this)">
-        <h3>Chapitre 3 — Les conditions</h3>
-        <span>▼</span>
-      </div>
-      <div class="chapter-content">
-
-        <div class="exercice">
-          <h4>Exercice 3.1</h4>
-          <p>Vérifier si un nombre est positif, négatif ou nul.</p>
-          <pre>n = int(input("Entrez un nombre : "))
-
-if n > 0:
-    print("Positif")
-elif n < 0:
-    print("Négatif")
-else:
-    print("Nul")</pre>
-          <div class="explication">
-            On utilise <code>if / elif / else</code> pour tester plusieurs conditions.
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+  </main>
 
   <footer>
-    Contenu réservé aux possesseurs du livre — Tous droits réservés
+    Contenu pédagogique réservé — Reproduction interdite — Pyodide local © 2024
   </footer>
 
+  <!-- PrismJS local -->
+  <script src="./assets/prism/prism.min.js"></script>
+  <script src="./assets/prism/prism-python.min.js"></script>
+
   <script>
-    // Ouvrir / fermer les chapitres
-    function toggleChapter(header) {
-      const content = header.nextElementSibling;
-      const arrow = header.querySelector('span');
+    /* --- SCRIPT JAVASCRIPT COMPLET --- */
 
-      content.classList.toggle('active');
-      arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+    /* VARIABLES GLOBALES */
+    let db = []; // Stockage local des données BDD
+    let pyodideInstance = null;
+    let currentChapter = null;
+    let currentExercise = null;
+    
+    // Pile pour l'historique de l'éditeur (Undo/Redo)
+    let historyStack = [];
+    let historyStep = -1;
+
+    /* ÉLÉMENTS DOM RÉCURRENTS */
+    const textarea = document.getElementById('code-input');
+    const codeBlock = document.getElementById('code-block');
+
+    /* INITIALISATION AU CHARGEMENT */
+    window.onload = () => {
+      // 1. Vérification accès (simple sécurité locale)
+      if (localStorage.getItem('access_granted') !== 'true') {
+         // window.location.href = 'index.html'; // Rediriger si pas d'accès
+         console.log("Accès non vérifié (désactivé pour démo)");
+      }
+
+      loadSavedTheme();
+      loadExercisesFromDB(); // Fetch BDD PHP
+      initPyodide();        // Charge Wasm local
+    };
+
+    /* 1. CHARGEMENT DES DONNÉES (FETCH PHP/SQL) */
+    async function loadExercisesFromDB() {
+      const container = document.getElementById('chapters-list');
+      container.innerHTML = '<p style="color: #94a3b8; text-align:center; grid-column: 1/-1;">⏳ Chargement des données depuis la base de données...</p>';
+
+      try {
+        // Appelle le script PHP qui retourne le JSON complet
+        const response = await fetch('get_exercises.php');
+
+        if (!response.ok) {
+          throw new Error(`Erreur serveur (Code ${response.status}). Assurez-vous d'utiliser un serveur web (Wamp/Xampp).`);
+        }
+
+        const data = await response.json();
+        console.log("Données BDD reçues :", data);
+
+        if (Array.isArray(data) && data.length > 0) {
+          db = data;
+          renderChaptersGrille();
+        } else {
+          container.innerHTML = '<p style="color: #f59e0b; text-align:center; grid-column: 1/-1;">⚠️ La base de données ne contient aucun chapitre ou exercice valide.</p>';
+        }
+
+      } catch (error) {
+        console.error('Erreur fetch BDD :', error);
+        container.innerHTML = `<div style="color: #f43f5e; text-align:center; grid-column: 1/-1; background:#1e293b; padding:20px; border-radius:8px;">
+                                ❌ Erreur de connexion à la base de données.<br>
+                                <small style="color:#64748b;">fetch('get_exercises.php') a échoué.</small><br><br>
+                                <small>${error.message}</small>
+                              </div>`;
+      }
     }
 
-    // Déconnexion
+    /* 2. INITIALISATION DE PYODIDE (LOCAL WASM) */
+    async function initPyodide() {
+      const statusEl = document.getElementById('pyodide-status');
+      const consoleEl = document.getElementById('console-output');
+      const runBtn = document.getElementById('run-btn');
+
+      try {
+        statusEl.textContent = '⚡ Initialisation Python...';
+        
+        // Charge Pyodide depuis le dossier local ./pyodide/
+        pyodideInstance = await loadPyodide({
+          indexURL: "./pyodide/"
+        });
+
+        // Configuration de stdin (input()) via prompt JS
+        pyodideInstance.setStdin({
+          stdin: () => {
+            const result = window.prompt("Python demande une saisie utilisateur (input) :");
+            return result !== null ? result : ""; // Retourne chaîne vide si Annuler
+          }
+        });
+
+        statusEl.textContent = '✅ Python 3 prêt (Offline)';
+        statusEl.style.color = '#10b981';
+        consoleEl.textContent = 'Environnement Python prêt. Sélectionnez un exercice pour charger son corrigé.';
+        // Le bouton exécuter sera activé au chargement d'un exercice
+      } catch (err) {
+        statusEl.textContent = '❌ Erreur Pyodide local';
+        statusEl.style.color = '#f43f5e';
+        consoleEl.textContent = 'Erreur lors du chargement des fichiers Pyodide locaux depuis le dossier ./pyodide/.\n' + err.message;
+        console.error(err);
+      }
+    }
+
+    /* 3. VUE 1 : AFFICHAGE DE LA GRILLE DES CHAPITRES */
+    function renderChaptersGrille() {
+      const container = document.getElementById('chapters-list');
+      container.innerHTML = '';
+
+      db.forEach(chap => {
+        const card = document.createElement('div');
+        card.className = 'chapter-card';
+        card.onclick = () => openChapter(chap.id);
+
+        // Compte les exercices dans la hiérarchie JSON
+        const count = (chap.exercises && Array.isArray(chap.exercises)) ? chap.exercises.length : 0;
+        
+        card.innerHTML = `
+          <h3>${chap.title}</h3>
+          <span class="badge">${count > 0 ? count + ' solution(s) disponible(s)' : 'Contenu à venir'}</span>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+
+    /* 4. VUE 2 : OUVERTURE D'UN CHAPITRE (ESPACE DE TRAVAIL) */
+    function openChapter(chapterId) {
+      // Trouve le chapitre correspondant dans les données
+      currentChapter = db.find(c => c.id == chapterId);
+      if (!currentChapter) return;
+
+      // Bascule l'affichage (animation CSS translateX)
+      document.getElementById('chapters-view').style.display = 'none';
+      document.getElementById('workspace-view').classList.add('active');
+      
+      // Met à jour les titres de l'espace de travail
+      document.getElementById('current-chapter-title').textContent = currentChapter.title;
+      
+      // Génère le menu accordéon
+      renderExercisesAccordion();
+      
+      // Charge le premier exercice par défaut s'il existe
+      if (currentChapter.exercises && currentChapter.exercises.length > 0) {
+        loadExercise(currentChapter.exercises[0].id);
+      } else {
+        showChapterEmptyState();
+      }
+    }
+
+    // Retour à la grille
+    function showChaptersList() {
+      document.getElementById('workspace-view').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('chapters-view').style.display = 'block';
+      }, 300); // Temps transition CSS
+    }
+
+    /* 5. GÉNÉRATION DE L'ACCORDÉON DES EXERCICES (SIDEBAR) - AVEC CATÉGORIES & NUMÉROTATION GLOBALE */
+    function renderExercisesAccordion() {
+      const accordionContainer = document.getElementById('exercise-accordion');
+      accordionContainer.innerHTML = ''; // Vide le container
+
+      if (!currentChapter || !currentChapter.exercises || currentChapter.exercises.length === 0) {
+        accordionContainer.innerHTML = '<p style="color: #94a3b8; padding:15px; font-size:0.85rem; font-style:italic;">Aucun exercice dans ce chapitre.</p>';
+        return;
+      }
+
+      // --- ÉTAPE 1 : Regrouper les exercices par catégorie ---
+      // Structure : { "Activité": [ex1, ex2], "Défi": [ex3], "Autres": [ex4] }
+      const groupedExercises = currentChapter.exercises.reduce((acc, ex) => {
+        // SQL: categorie (Activité, Application rapide, Défi, Exercice)
+        const cat = ex.categorie || "Autres"; 
+        if (!acc[cat]) {
+          acc[cat] = [];
+        }
+        acc[cat].push(ex);
+        return acc;
+      }, {});
+
+      // --- ÉTAPE 2 : Générer le HTML de l'accordéon ---
+      let globalExerciseNumber = 1; // Compteur pour Exercice1, Exercice2...
+
+      // Ordre de tri souhaité pour les catégories
+      const categoryOrder = ["Activité", "Application rapide", "Exercice", "Défi", "Autres"];
+      
+      // Trie les clés récupérées selon l'ordre défini
+      const sortedCategories = Object.keys(groupedExercises).sort((a, b) => {
+          let indexA = categoryOrder.indexOf(a);
+          let indexB = categoryOrder.indexOf(b);
+          if (indexA === -1) indexA = 99; // Catégories inconnues à la fin
+          if (indexB === -1) indexB = 99;
+          return indexA - indexB;
+      });
+
+      // Parcourt les catégories triées
+      sortedCategories.forEach(category => {
+        const exercises = groupedExercises[category];
+        
+        // A. Créer le bouton de la catégorie (Header)
+        const categoryHeader = document.createElement('button');
+        categoryHeader.className = 'accordion-category';
+        categoryHeader.innerHTML = `
+          ${category} (${exercises.length})
+          <span class="category-icon">▼</span>
+        `;
+        
+        // B. Créer le conteneur du contenu (Content)
+        const categoryContent = document.createElement('div');
+        categoryContent.className = 'accordion-content';
+
+        // C. Ajouter les exercices dans le contenu
+        exercises.forEach(ex => {
+          const exerciseItem = document.createElement('div');
+          // Définit active si c'est l'ex courant
+          const isActive = currentExercise && currentExercise.id === ex.id;
+          exerciseItem.className = `exercise-item ${isActive ? 'active' : ''}`;
+          exerciseItem.id = `nav-${ex.id}`; // ID unique pour mise à jour rapide
+
+          // Construit le titre avec le numéro global EXEMPLE : "Exercice3 : Diviseurs"
+          exerciseItem.innerHTML = `
+            <span class="ex-number">Exercice${globalExerciseNumber}</span> 
+            <span class="ex-title">${ex.title}</span>
+          `;
+          
+          // Clic : charge l'exercice
+          exerciseItem.onclick = (e) => {
+              e.stopPropagation(); // Évite trigger clic header
+              loadExercise(ex.id);
+          };
+
+          categoryContent.appendChild(exerciseItem);
+          globalExerciseNumber++; // Incrémente le numéro pour le prochain
+        });
+
+        // --- ÉTAPE 3 : Logique masquer/afficher (Masquer par défaut en CSS max-height:0) ---
+        categoryHeader.onclick = function() {
+            // Tourne flèche
+            this.classList.toggle('active');
+            
+            const content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                // Ouvert -> Fermer
+                content.style.maxHeight = null;
+            } else {
+                // Fermé -> Ouvrir (calcul hauteur réelle)
+                content.style.maxHeight = content.scrollHeight + "px";
+                
+                // OPTIONNEL : Fermer les autres (mode accordéon strict)
+                /*
+                document.querySelectorAll('.accordion-category').forEach(h => {
+                    if (h !== this && h.classList.contains('active')) {
+                        h.classList.remove('active');
+                        h.nextElementSibling.style.maxHeight = null;
+                    }
+                });
+                */
+            }
+        };
+
+        // Ajoute au container principal
+        accordionContainer.appendChild(categoryHeader);
+        accordionContainer.appendChild(categoryContent);
+        
+        // --- ÉTAPE 4 : Ouvrir automatiquement catégorie de l'exercice actif ---
+        if (currentExercise && exercises.some(e => e.id === currentExercise.id)) {
+            categoryHeader.classList.add('active');
+            categoryContent.style.maxHeight = categoryContent.scrollHeight + "px";
+        }
+      });
+      
+      // Si aucun ex chargé, ouvre première catégorie
+      if (!currentExercise && accordionContainer.firstChild) {
+          accordionContainer.firstChild.click();
+      }
+    }
+
+    /* 6. CHARGEMENT D'UN EXERCICE (MISE À JOUR ESPACE TRAVAIL) */
+    function loadExercise(exId) {
+      currentExercise = currentChapter.exercises.find(e => e.id === exId);
+      if (!currentExercise) return;
+
+      // --- A. GESTION ÉTAT ACTIF SIDEBAR (SANS RE-RENDER COMPLET) ---
+      // 1. Retire active partout
+      document.querySelectorAll('.accordion-content .exercise-item').forEach(item => {
+          item.classList.remove('active');
+      });
+      
+      // 2. Ajoute active à l'item cliqué (nav-ID)
+      const clickedItem = document.getElementById(`nav-${exId}`);
+      if (clickedItem) {
+          clickedItem.classList.add('active');
+          
+          // S'assurer que le parent est ouvert (cas appel externe)
+          const parentContent = clickedItem.closest('.accordion-content');
+          const parentHeader = parentContent.previousElementSibling;
+          if (!parentHeader.classList.contains('active')) {
+              parentHeader.click(); // Force ouverture
+          }
+      }
+      // -----------------------------------------------------------
+
+      // B. Mise à jour de l'énoncé et onglets bas
+      document.getElementById('exercise-title').textContent = currentExercise.title;
+      // SQL: statement (text avec retours ligne \r\n gérés par pre-wrap ou conversion <br>)
+      document.getElementById('exercise-body').innerHTML = currentExercise.statement; 
+      document.getElementById('explanation-body').innerHTML = currentExercise.explanation || "<i>Pas d'explication détaillée fournie.</i>";
+      
+      const simBody = document.getElementById('simulation-body');
+      // SQL: simulation_html (HTML brut ou NULL)
+      if (currentExercise.simulation_html && currentExercise.simulation_html.trim() !== "") {
+          simBody.innerHTML = currentExercise.simulation_html;
+          switchTab('explanation'); // Switch explic par défaut
+      } else {
+          simBody.innerHTML = "<p style='color: #64748b; font-style:italic;'>Aucune simulation interactive spécifique n'est disponible pour cet exercice. Testez des variantes directement dans l'éditeur.</p>";
+          switchTab('explanation');
+      }
+      
+      // C. Charger le code dans le textarea et RÉINITIALISER L'HISTORIQUE
+      textarea.value = currentExercise.code;
+      
+      // Pile historique RAZ pour ce nouvel exercice
+      historyStack = [currentExercise.code];
+      historyStep = 0;
+
+      // D. Mettre à jour l'affichage PrismJS (coloration)
+      updatePrismDisplay();
+
+      // E. UI State
+      if (pyodideInstance) {
+          document.getElementById('run-btn').disabled = false;
+      }
+      document.getElementById('console-output').textContent = "Corrigé chargé. Cliquez sur 'Exécuter le code' pour voir le résultat.";
+      document.getElementById('console-output').style.color = "#e2e8f0";
+    }
+
+    function showChapterEmptyState() {
+      currentExercise = null;
+      document.getElementById('exercise-title').textContent = "Solutions à venir";
+      document.getElementById('exercise-body').innerHTML = "<p style='color: #94a3b8;'>Les corrigés pour ce chapitre seront bientôt disponibles.</p>";
+      document.getElementById('explanation-body').innerHTML = "Contenu en cours de rédaction.";
+      document.getElementById('simulation-body').innerHTML = "Pas de simulation.";
+      textarea.value = "# Solutions bientôt disponibles\nprint('Sélectionnez un autre chapitre.')";
+      updatePrismDisplay();
+      document.getElementById('run-btn').disabled = true;
+    }
+
+    /* 7. GESTION DE L'ÉDITEUR : SYNTAX HIGHLIGHT, TAB & HISTORIQUE */
+    
+    // Fonction centrale pour colorer le code (PrismJS)
+    function updatePrismDisplay() {
+        if (!textarea || !codeBlock) return;
+        let content = textarea.value;
+        // Prism ignore la dernière ligne si vide, on ajoute un espace
+        if (content[content.length - 1] === "\n") content += " ";
+        
+        codeBlock.textContent = content;
+
+        if (window.Prism) {
+            Prism.highlightElement(codeBlock); // Applique coloration
+        }
+    }
+
+    // Appelé par oninput="" dans le HTML (frappe utilisateur)
+    function updateEditor() {
+      updatePrismDisplay();
+      saveState(textarea.value); // Enregistre dans l'historique après frappe
+    }
+
+    // Sauvegarde local du thème
+    function loadSavedTheme() {
+      const savedTheme = localStorage.getItem('editor_theme') || 'tomorrownight';
+      document.getElementById('theme-select').value = savedTheme;
+      changeTheme(savedTheme);
+    }
+
+    // Change thème Prism dynamiquement
+    function changeTheme(themeName) {
+      const themeLink = document.getElementById('prism-theme');
+      let themeFile = `./assets/prism/prism-${themeName}.min.css`;
+      if (themeName === 'default') themeFile = `./assets/prism/prism.min.css`;
+
+      themeLink.setAttribute('href', themeFile);
+      localStorage.setItem('editor_theme', themeName); // Sauvegarde choix
+
+      setTimeout(updatePrismDisplay, 50); // Recalcule Prism après chargement CSS
+    }
+
+    // Gère indentation touche Tab (4 espaces)
+    function handleTab(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault(); // Empêche perte focus
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        // Insère 4 espaces
+        textarea.value = textarea.value.substring(0, start) + "    " + textarea.value.substring(end);
+        // Replace curseur
+        textarea.selectionStart = textarea.selectionEnd = start + 4;
+        updateEditor(); // Update display + histoire
+      }
+    }
+
+    /* 8. LOGIQUE UNDO / REDO (CORRIGÉE) */
+    
+    function saveState(val) {
+      // Ne pas enregistrer si valeur identique à l'étape actuelle
+      if (historyStep >= 0 && historyStack[historyStep] === val) return;
+
+      // Si on écrit après des Undo, supprime la branche "Redo" future
+      if (historyStep < historyStack.length - 1) {
+        historyStack = historyStack.slice(0, historyStep + 1);
+      }
+      
+      // Ajoute à la pile
+      historyStack.push(val);
+      historyStep++;
+      
+      // Limite pile (optionnel)
+      if (historyStack.length > 100) {
+          historyStack.shift();
+          historyStep--;
+      }
+    }
+
+    function undoCode() { 
+      if (historyStep > 0) { 
+        historyStep--; 
+        textarea.value = historyStack[historyStep]; 
+        updatePrismDisplay(); // Update display SANS saveState()
+        textarea.focus();
+      } 
+    }
+
+    function redoCode() { 
+      if (historyStep < historyStack.length - 1) { 
+        historyStep++; 
+        textarea.value = historyStack[historyStep]; 
+        updatePrismDisplay(); // Update display SANS saveState()
+        textarea.focus();
+      } 
+    }
+
+    /* 9. EXÉCUTION DU CODE AVEC PYODIDE (WASM LOCAL) */
+    async function runPython() {
+      if (!pyodideInstance) {
+        alert("L'environnement Python (local) est en cours de chargement...");
+        return;
+      }
+
+      const consoleEl = document.getElementById('console-output');
+      const runBtn = document.getElementById('run-btn');
+      
+      // UI State
+      consoleEl.textContent = "⏳ Exécution locale en cours...\n";
+      consoleEl.style.color = "#e2e8f0";
+      runBtn.innerHTML = "<span>⏳</span> En cours...";
+      runBtn.disabled = true;
+
+      try {
+        // Redirection stdout (print())
+        pyodideInstance.setStdout({
+          batched: (text) => {
+            consoleEl.textContent += text + "\n";
+            consoleEl.scrollTop = consoleEl.scrollHeight; // Scroll auto bottom
+          }
+        });
+
+        // Redirection stderr (erreurs)
+        pyodideInstance.setStderr({
+          batched: (text) => {
+            consoleEl.textContent += text + "\n";
+            consoleEl.style.color = "#f43f5e"; // Rouge errors
+          }
+        });
+
+        // Exécution asynchrone
+        await pyodideInstance.runPythonAsync(textarea.value);
+
+        // Si aucune sortie printed
+        if (consoleEl.textContent === "⏳ Exécution locale en cours...\n") {
+          consoleEl.textContent += "➡️ Code exécuté avec succès (aucune sortie imprimée).";
+        } else if (!consoleEl.style.color.includes('f43f5e')) {
+             consoleEl.textContent += "\n✅ Terminé.";
+        }
+        
+      } catch (err) {
+        // Erreurs Python (Syntax, Type, etc.)
+        consoleEl.textContent += "\n❌ Erreur d'exécution Python :\n" + err.message;
+        consoleEl.style.color = "#f43f5e";
+      } finally {
+        // UI State reset
+        runBtn.innerHTML = "<span>▶</span> Exécuter le code";
+        runBtn.disabled = false;
+      }
+    }
+
+    /* 10. OUTILS ÉDITEUR (COPIER, RAZ) */
+    
+    function copyCode() {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      // Sélection ou tout le code
+      const textToCopy = (start !== end) ? textarea.value.substring(start, end) : textarea.value;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        // Notif visuelle temporaire sur le bouton
+        const btn = document.querySelector('[onclick="copyCode()"]');
+        const original = btn.innerHTML;
+        btn.innerHTML = "✅ Copié !";
+        setTimeout(() => btn.innerHTML = original, 1200);
+      }).catch(err => {
+        alert("Erreur lors de la copie : " + err);
+      });
+    }
+
+    async function pasteCode() {
+      try {
+        const textToPaste = await navigator.clipboard.readText();
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+
+        // Insère au curseur
+        textarea.value = textarea.value.substring(0, start) + textToPaste + textarea.value.substring(end);
+        // Replace curseur après
+        textarea.selectionStart = textarea.selectionEnd = start + textToPaste.length;
+        
+        textarea.focus();
+        updateEditor(); // Force Prism + histoire
+      } catch (err) {
+        alert("Impossible d'accéder au presse-papier.\nVérifiez les permissions du navigateur.");
+      }
+    }
+
+    function resetSolution() { 
+      if (currentExercise && confirm("Annuler vos modifications et restaurer le corrigé original ?")) { 
+        textarea.value = currentExercise.code;
+        updateEditor(); // Save comme nouvel état
+      } 
+    }
+
+    /* 11. GESTION ONGLETS & DÉCONNEXION */
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tabName === 'explanation') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-explanation').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-simulation').classList.add('active');
+      }
+    }
+
     function logout() {
-      // On enlève seulement l'accès, on garde le device_id
-      // comme ça la même machine reste reconnue
       localStorage.removeItem('access_granted');
-      localStorage.removeItem('access_code');
-      window.location.href = '/index.html';
+      window.location.href = 'index.html';
     }
-
-    // Ouvrir le premier chapitre par défaut
-    document.querySelector('.chapter-content').classList.add('active');
-    document.querySelector('.chapter-header span').textContent = '▲';
   </script>
 </body>
 </html>

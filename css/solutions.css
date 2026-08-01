@@ -1,0 +1,368 @@
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 60px;
+      flex-shrink: 0;
+    }
+
+    header h1 { font-size: 1.2rem; color: #38bdf8; }
+
+    .nav-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover { background: #475569; }
+
+    main { flex: 1; overflow-y: auto; position: relative; }
+
+    /* VUE 1 : CHAPITRES */
+    #chapters-view {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .welcome {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .welcome h2 { color: #38bdf8; margin-bottom: 6px; }
+
+    .chapter-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 18px 24px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .chapter-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    .badge {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      border: 1px solid #334155;
+    }
+
+    /* VUE 2 : ESPACE DE TRAVAIL */
+    #workspace-view { display: none; height: 100%; width: 100%; }
+    #workspace-view.active { display: flex; }
+
+    /* PANNEAU GAUCHE */
+    .sidebar {
+      width: 280px;
+      background: #1e293b;
+      border-right: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid #334155;
+      background: #0f172a;
+    }
+
+    .back-link {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .back-link:hover { color: #38bdf8; }
+
+    .exercise-list { flex: 1; overflow-y: auto; padding: 12px; }
+
+    .exercise-item {
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #cbd5e1;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .exercise-item:hover { border-color: #38bdf8; color: #38bdf8; }
+    .exercise-item.active { background: #0284c7; border-color: #38bdf8; color: #fff; font-weight: 600; }
+
+    /* PANNEAU DROIT */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      background: #0f172a;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    /* ÉNONCÉ */
+    .statement-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .statement-box h2 { font-size: 1.15rem; color: #38bdf8; margin-bottom: 8px; }
+    .statement-box p { color: #cbd5e1; font-size: 0.92rem; }
+
+    /* ÉDITEUR */
+    .editor-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+
+    .toolbar {
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .tool-btn:hover { background: #334155; color: #fff; }
+
+    .run-btn {
+      background: #10b981 !important;
+      color: #042f2e !important;
+      font-weight: bold;
+      border: none !important;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .run-btn:hover { background: #34d399 !important; }
+    .run-btn:disabled { background: #64748b !important; cursor: not-allowed; }
+
+    .pyodide-status {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      margin-left: auto;
+    }
+
+    .editor-wrapper {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }/* Le conteneur de l'éditeur */
+.editor-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 250px;
+}
+
+/* Le textarea transparent (au-dessus) */
+.editor-wrapper textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important; /* Doit rester transparent pour voir Prism en dessous */
+  color: transparent !important;     /* Le texte saisi est masqué, seul le curseur est visible */
+  caret-color: #38bdf8;             /* Couleur du curseur de frappe */
+  z-index: 2;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px;
+  border: none;
+  resize: vertical;
+  outline: none;
+  white-space: pre;
+  overflow: auto;
+}
+
+/* Le bloc Prism (en dessous) */
+.editor-wrapper pre {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 10px;
+  z-index: 1;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: auto;
+  pointer-events: none; /* Laisse les clics traverser vers le textarea */
+}
+
+    textarea#code-input, pre#code-highlight {
+      margin: 0;
+      padding: 14px;
+      border: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      tab-size: 4;
+      position: absolute;
+      top: 0; left: 0;
+      box-sizing: border-box;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    textarea#code-input {
+      color: transparent;
+      background: transparent;
+      caret-color: #38bdf8;
+      z-index: 2;
+      resize: none;
+      outline: none;
+    }
+
+    pre#code-highlight { z-index: 1; pointer-events: none; background: transparent !important; }
+
+    /* CONSOLE DE SORTIE PYTHON */
+    .console-box {
+      background: #000;
+      color: #10b981;
+      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 12px;
+      border-top: 1px solid #334155;
+      min-height: 90px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    .console-title { font-weight: bold; color: #64748b; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; }
+
+    /* SECTION BASSE : EXPLICATION & SIMULATION */
+    .bottom-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+      background: #1e293b;
+    }
+
+    .tab-content { padding: 20px; display: none; }
+    .tab-content.active { display: block; }
+
+    /* SIMULATEUR */
+    .sim-container {
+      background: #0f172a;
+      border: 1px dashed #334155;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .sim-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .sim-input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      width: 120px;
+    }
+
+    .sim-result-box {
+      background: #1e293b;
+      padding: 14px;
+      border-radius: 6px;
+      color: #f8fafc;
+      font-weight: 500;
+    }
+
+    footer {
+      text-align: center;
+      padding: 8px;
+      color: #64748b;
+      font-size: 0.75rem;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+    }

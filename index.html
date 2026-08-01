@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accès aux Solutions Python</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(135deg, #0f172a, #1e293b);
@@ -20,7 +15,6 @@
       justify-content: center;
       color: #e2e8f0;
     }
-
     .card {
       background: #1e293b;
       border: 1px solid #334155;
@@ -30,31 +24,10 @@
       max-width: 420px;
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
     }
-
-    .logo {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .logo h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #38bdf8;
-      margin-bottom: 6px;
-    }
-
-    .logo p {
-      font-size: 0.95rem;
-      color: #94a3b8;
-    }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-      color: #cbd5e1;
-    }
-
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo h1 { font-size: 1.6rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
+    .logo p { font-size: 0.95rem; color: #94a3b8; }
+    label { display: block; font-size: 0.9rem; margin-bottom: 8px; color: #cbd5e1; }
     input[type="text"] {
       width: 100%;
       padding: 14px 16px;
@@ -65,13 +38,8 @@
       font-size: 1.05rem;
       letter-spacing: 1px;
       outline: none;
-      transition: border-color 0.2s;
     }
-
-    input[type="text"]:focus {
-      border-color: #38bdf8;
-    }
-
+    input[type="text"]:focus { border-color: #38bdf8; }
     button {
       width: 100%;
       margin-top: 20px;
@@ -83,18 +51,9 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
     }
-
-    button:hover {
-      background: #0284c7;
-    }
-
-    button:disabled {
-      background: #475569;
-      cursor: not-allowed;
-    }
-
+    button:hover { background: #0284c7; }
+    button:disabled { background: #475569; cursor: not-allowed; }
     .message {
       margin-top: 18px;
       padding: 12px;
@@ -103,25 +62,9 @@
       text-align: center;
       display: none;
     }
-
-    .message.error {
-      background: #7f1d1d;
-      color: #fecaca;
-      display: block;
-    }
-
-    .message.success {
-      background: #14532d;
-      color: #bbf7d0;
-      display: block;
-    }
-
-    .footer {
-      margin-top: 28px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #64748b;
-    }
+    .message.error { background: #7f1d1d; color: #fecaca; display: block; }
+    .message.success { background: #14532d; color: #bbf7d0; display: block; }
+    .footer { margin-top: 28px; text-align: center; font-size: 0.8rem; color: #64748b; }
   </style>
 </head>
 <body>
@@ -133,92 +76,73 @@
 
     <form id="codeForm">
       <label for="code">Code d’activation</label>
-      <input 
-        type="text" 
-        id="code" 
-        name="code" 
-        placeholder="Ex : ABC-123-XYZ" 
-        required 
-        autocomplete="off"
-        maxlength="20"
-      >
+      <input type="text" id="code" placeholder="Ex : ABC-123-XYZ" required maxlength="20" autocomplete="off">
       <button type="submit" id="submitBtn">Vérifier le code</button>
     </form>
 
     <div id="message" class="message"></div>
-
-    <div class="footer">
-      Entrez le code unique présent dans votre livre
-    </div>
+    <div class="footer">Entrez le code unique présent dans votre livre</div>
   </div>
 
-<script>
-  // Générer ou récupérer un identifiant unique de machine
-  function getDeviceId() {
-    let deviceId = localStorage.getItem('device_id');
-    if (!deviceId) {
-      deviceId = crypto.randomUUID();
-      localStorage.setItem('device_id', deviceId);
-    }
-    return deviceId;
-  }
-
-  const form = document.getElementById('codeForm');
-  const message = document.getElementById('message');
-  const submitBtn = document.getElementById('submitBtn');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const code = document.getElementById('code').value.trim().toUpperCase();
-    const deviceId = getDeviceId();
-
-    if (!code) return;
-
-    message.className = 'message';
-    message.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Vérification...';
-
-    try {
-      const response = await fetch('/api/verify-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          code: code,
-          device_id: deviceId
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        message.className = 'message success';
-        message.textContent = 'Code valide ! Redirection...';
-        message.style.display = 'block';
-
-        localStorage.setItem('access_granted', 'true');
-        localStorage.setItem('access_code', code);
-
-        setTimeout(() => {
-          window.location.href = '/solutions.html';
-        }, 1200);
-      } else {
-        message.className = 'message error';
-        message.textContent = data.error || 'Code invalide';
-        message.style.display = 'block';
+  <script>
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('device_id');
+      if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem('device_id', deviceId);
       }
-    } catch (err) {
-      message.className = 'message error';
-      message.textContent = 'Erreur de connexion. Réessayez.';
-      message.style.display = 'block';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Vérifier le code';
+      return deviceId;
     }
-  });
-</script>
+
+    const form = document.getElementById('codeForm');
+    const message = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const code = document.getElementById('code').value.trim().toUpperCase();
+      const deviceId = getDeviceId();
+
+      message.className = 'message';
+      message.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Vérification...';
+
+      try {
+        const response = await fetch('api/verify-code.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, device_id: deviceId })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          message.className = 'message success';
+          message.textContent = 'Code valide ! Redirection...';
+          message.style.display = 'block';
+
+          localStorage.setItem('access_granted', 'true');
+          localStorage.setItem('access_code', code);
+
+          setTimeout(() => {
+            window.location.href = 'solutions.html';
+          }, 1000);
+        } else {
+          message.className = 'message error';
+          message.textContent = data.error || 'Code invalide';
+          message.style.display = 'block';
+        }
+      } catch (err) {
+        message.className = 'message error';
+        message.textContent = 'Erreur de connexion';
+        message.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Vérifier le code';
+      }
+    });
+  </script>
 </body>
 </html>
