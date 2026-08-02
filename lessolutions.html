@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solutions Python - Espace Réservé</title>
+  
+  <!-- Balise link dynamique pour changer le thème CSS de Prism -->
+  <link id="prism-theme" rel="stylesheet" href="./assets/prism/prism-tomorrownight.min.css" />
+   <link rel="stylesheet" href="css/style.css" />
+  
+  <!-- Pyodide local -->
+  <script src="./pyodide/pyodide.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>Solutions Python - Espace Interactif</h1>
+    <button class="nav-btn" onclick="logout()">Déconnexion</button>
+  </header>
+
+  <main>
+    
+    <!-- VUE 1 : CHAPITRES -->
+    <div id="chapters-view">
+      <div class="welcome">
+        <h2>Bienvenue dans votre Espace Solutions</h2>
+        <p>Sélectionnez un chapitre pour accéder aux exercices. Vous pourrez visualiser les corrigés, lire les explications et exécuter le code Python réel en local grâce à Pyodide (Wasm).</p>
+      </div>
+
+      <div id="chapters-list">
+          <!-- Rempli dynamiquement par JS -->
+      </div>
+    </div>
+
+    <!-- VUE 2 : ESPACE DE TRAVAIL (SPLIT SCREEN) -->
+    <div id="workspace-view">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <a class="back-link" onclick="showChaptersList()">← Retour aux chapitres</a>
+          <h3 id="current-chapter-title" style="margin-top: 8px; color:#38bdf8; font-size:0.95rem;">Chapitre</h3>
+        </div>
+        <div class="exercise-accordion" id="exercise-accordion">
+            <p style="color: #64748b; padding: 15px; font-size:0.85rem;">Chargement des exercices...</p>
+        </div>
+      </aside>
+
+      <section class="content-area">
+        
+        <!-- 1. ÉNONCÉ -->
+        <div class="statement-box">
+          <h2 id="exercise-title">Sélectionnez un exercice</h2>
+          <div id="exercise-body">
+            <p style="color: #64748b;">Choisissez un exercice dans le menu de gauche pour afficher son énoncé, son corrigé et son explication.</p>
+          </div>
+        </div>
+
+        <!-- 2. ÉDITEUR + CONSOLE -->
+        <div class="editor-section">
+          <div class="toolbar">
+            <button id="run-btn" class="tool-btn run-btn" onclick="runPython()" disabled>
+              <span>▶</span> Exécuter le code
+            </button>
+            <span style="color: #334155;">|</span>
+            <button class="tool-btn" onclick="undoCode()">↶ Annuler</button>
+            <button class="tool-btn" onclick="redoCode()">↷ Rétablir</button>
+            <!--<button class="tool-btn" onclick="copyCode()">✂️ Copier</button>
+            <button class="tool-btn" onclick="pasteCode()">📋 Coller</button>-->
+            <button class="tool-btn" onclick="resetSolution()">🔄 Réinitialiser</button>
+            <span style="color: #334155;">|</span>
+            <label style="color:#94a3b8; font-size:0.8rem;" for="theme-select">🎨 Thème :</label>
+            <select id="theme-select" class="tool-btn" style="padding: 2px 5px;" onchange="changeTheme(this.value)">
+              <option value="tomorrownight">Dark (Tomorrow Night)</option>
+              <option value="okaidia">Monokai (Okaidia)</option>
+              <option value="twilight">Twilight</option>
+              <option value="dark">Dark Standard</option>
+              <option value="default">Clair (Standard)</option>
+              <option value="coy">Coy (Épuré)</option>
+            </select>
+
+            <span class="pyodide-status" id="pyodide-status">⚡ Chargement Python...</span>
+          </div>
+
+          <!-- Zone d'édition -->
+          <div class="editor-wrapper">
+            <div class="code-scroll-wrapper">
+                <textarea id="code-input" spellcheck="false" oninput="updateEditor()" onkeydown="handleTab(event)"></textarea>
+                <pre id="code-highlight"><code class="language-python" id="code-block"></code></pre>
+            </div>
+          </div>
+
+          <!-- Console de sortie Python -->
+          <div class="console-box">
+            <div class="console-title">Console de sortie Python (Pyodide Wasm) :</div>
+            <pre id="console-output">Sélectionnez un exercice pour charger le code corrigé.</pre>
+          </div>
+        </div>
+
+        <!-- 3. SECTION BASSE : EXPLICATION & SIMULATION -->
+        <div class="bottom-section">
+          <div class="tabs">
+            <button class="tab-btn active" id="btn-tab-explanation" onclick="switchTab('explanation')">💡 Explication de la solution</button>
+            <button class="tab-btn" id="btn-tab-simulation" onclick="switchTab('simulation')">⚙️ Simulation interactive</button>
+          </div>
+
+          <!-- Onglet 1 : Explication -->
+          <div id="tab-explanation" class="tab-content active">
+            <div id="explanation-body">
+              <p style="color: #94a3b8; font-style:italic;">Sélectionnez un exercice pour lire l'explication détaillée du code.</p>
+            </div>
+          </div>
+
+          <!-- Onglet 2 : Simulation -->
+          <div id="tab-simulation" class="tab-content">
+            <div id="simulation-body">
+              <p style="color: #94a3b8; font-style:italic;">Aucune simulation interactive spécifique n'est disponible pour cet exercice.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    Contenu pédagogique réservé — Reproduction interdite — collectionlogica © 2026
+  </footer>
+<script>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const codeArea = document.getElementById('code-input');
+  const editorWrapper = document.querySelector('.editor-wrapper');
+
+  if (codeArea) {
+    // 1. Bloquer la copie (Ctrl+C, Cmd+C, menu contextuel Copier)
+    codeArea.addEventListener('copy', (e) => {
+      e.preventDefault();
+      alert("La copie du code est désactivée pour cet exercice. Réécrivez le code manuellement !");
+    });
+
+    // 2. Bloquer le menu contextuel (clic droit) spécifiquement sur l'éditeur
+    codeArea.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // 3. Bloquer le glisser-déposer de texte (Drag and Drop) vers/depuis l'éditeur
+    codeArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+    });
+    
+    codeArea.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+  }
+
+  // 4. Bloquer la combinaison de touches Ctrl+C / Cmd+C quand l'utilisateur est dans l'éditeur
+  document.addEventListener('keydown', (e) => {
+    const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c';
+    if (isCopyShortcut && document.activeElement === codeArea) {
+      e.preventDefault();
+    }
+  });
+});
+
+
+</script>
+  <!-- PrismJS local -->
+  <script src="./assets/prism/prism.min.js"></script>
+  <script src="./assets/prism/prism-python.min.js"></script>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

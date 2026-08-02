@@ -1,0 +1,398 @@
+/* --- STYLES CSS INTÉGRÉS --- */
+    :root {
+      --bg-main: #0f172a; /* slate-900 */
+      --bg-side: #1e293b; /* slate-800 */
+      --bg-card: #1e293b;
+      --text-main: #f1f5f9; /* slate-100 */
+      --text-muted: #94a3b8; /* slate-400 */
+      --accent: #38bdf8; /* sky-400 */
+      --accent-hover: #7dd3fc; /* sky-300 */
+      --border: #334155; /* slate-700 */
+      --header-h: 60px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* --- HEADER & FOOTER --- */
+    header {
+      height: var(--header-h);
+      background-color: var(--bg-side);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    header h1 { font-size: 1.2rem; color: var(--accent); }
+
+    footer {
+      height: 30px;
+      background-color: var(--bg-side);
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* --- BOUTONS NAV --- */
+    .nav-btn {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background-color: var(--border); border-color: var(--accent); }
+
+    main { flex: 1; position: relative; width: 100%; overflow: hidden; }
+
+    /* --- VUE 1 : GRILLE DES CHAPITRES --- */
+    #chapters-view {
+      padding: 40px;
+      overflow-y: auto;
+      height: 100%;
+      width: 100%;
+    }
+
+    .welcome { text-align: center; margin-bottom: 40px; }
+    .welcome h2 { font-size: 2rem; margin-bottom: 10px; }
+    .welcome p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+    #chapters-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .chapter-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .chapter-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .chapter-card h3 { font-size: 1.1rem; line-height: 1.4; }
+
+    .badge {
+      font-size: 0.8rem;
+      background-color: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    /* --- VUE 2 : ESPACE DE TRAVAIL (SPLIT SCREEN) --- */
+    #workspace-view {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    #workspace-view.active { transform: translateX(0); }
+
+    /* SIDEBAR (Gauche) */
+    .sidebar {
+      width: 300px;
+      background-color: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 15px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    /* --- ACCORDÉON DES EXERCICES (SIDEBAR) --- */
+    .exercise-accordion {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0;
+    }
+
+    .accordion-category {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 12px 15px;
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      transition: background 0.2s;
+    }
+
+    .accordion-category:hover { background-color: #1e293b; }
+
+    .category-icon {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-category.active .category-icon {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #0f172a;
+    }
+
+    .accordion-content .exercise-item {
+      padding: 10px 15px 10px 30px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s;
+    }
+
+    .accordion-content .exercise-item:hover {
+      background-color: #1e293b;
+      color: #fff;
+    }
+
+    .accordion-content .exercise-item.active {
+      background-color: #1e293b;
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .ex-number {
+      color: #576b81;
+      margin-right: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+
+    /* ZONE DE CONTENU (Droite) */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background-color: var(--bg-main);
+    }
+
+    /* ÉNONCÉ */
+    .statement-box {
+      padding: 25px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .statement-box h2 { font-size: 1.4rem; margin-bottom: 10px; color: var(--accent); }
+    .statement-box p { color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; }
+
+    /* ÉDITEUR */
+    .editor-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background-color: var(--bg-side);
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      background-color: #334155;
+      border: 1px solid transparent;
+      color: var(--text-main);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .tool-btn:hover:not(:disabled) { background-color: #475569; border-color: var(--accent); }
+    .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .run-btn { background-color: #0369a1; font-weight: bold; }
+    .run-btn:hover:not(:disabled) { background-color: #0284c7; }
+
+    .pyodide-status { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+
+ /* --- CORRECTION BARRES DE DÉFILEMENT (SCROLLBARS) --- */
+
+.editor-wrapper {
+  position: relative;
+  height: 380px; /* Ou la hauteur souhaitée */
+  border: 1px solid var(--border);
+  border-radius: 0 0 4px 4px;
+  background-color: #0f172a;
+  overflow: hidden; /* Empêche les débordements extérieurs */
+}
+
+/* Le conteneur de défilement unique */
+.code-scroll-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Active les barres de défilement H / V */
+}
+
+/* Alignement parfait du Textarea et du rendu PrismJS */
+#code-input, #code-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 15px;
+  border: none;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 4;
+  white-space: pre; /* Conserve les espaces et lignes sans retour auto forcé */
+  word-wrap: normal;
+  box-sizing: border-box;
+}
+
+#code-input {
+  color: transparent;
+  background: transparent;
+  caret-color: var(--accent);
+  resize: none;
+  z-index: 2;
+  overflow: hidden; /* Laisse le défilement au wrapper parent */
+}
+
+#code-highlight {
+  z-index: 1;
+  background-color: transparent;
+  pointer-events: none; /* Laisse traverser les clics vers le textarea */
+}
+
+#code-highlight code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+    .console-box {
+      margin-top: 15px;
+      background-color: #000;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+    .console-title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
+    #console-output {
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 150px;
+      overflow-y: auto;
+      min-height: 40px;
+    }
+
+    .bottom-section {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+
+    .tabs { display: flex; gap: 5px; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--accent); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+    .tab-content { display: none; padding: 20px 0; flex: 1; overflow-y: auto;}
+    .tab-content.active { display: block; }
+    .tab-content p { line-height: 1.6; color: #cbd5e1; font-size: 0.9rem;}
+
+    /* Désactive la sélection de texte sur le composant d'affichage Prism */
+#code-highlight, #code-block {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+}

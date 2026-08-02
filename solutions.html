@@ -12,7 +12,7 @@
   <script src="./pyodide/pyodide.js"></script>
 
   <style>
-    /* --- STYLES CSS INTÉGRÉS (css/solutions.css) --- */
+    /* --- STYLES CSS INTÉGRÉS --- */
     :root {
       --bg-main: #0f172a; /* slate-900 */
       --bg-side: #1e293b; /* slate-800 */
@@ -170,11 +170,10 @@
     /* --- ACCORDÉON DES EXERCICES (SIDEBAR) --- */
     .exercise-accordion {
       flex: 1;
-      overflow-y: auto; /* Scroll interne */
+      overflow-y: auto;
       padding: 10px 0;
     }
 
-    /* En-tête de catégorie (Bouton masquer/afficher) */
     .accordion-category {
       width: 100%;
       background: none;
@@ -188,36 +187,32 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #1e293b; /* slate-800 */
+      border-bottom: 1px solid #1e293b;
       transition: background 0.2s;
     }
 
     .accordion-category:hover { background-color: #1e293b; }
 
-    /* Icône flèche */
     .category-icon {
       font-size: 0.8rem;
       color: var(--text-muted);
       transition: transform 0.3s ease;
     }
 
-    /* Rotation flèche quand ouvert */
     .accordion-category.active .category-icon {
       transform: rotate(180deg);
       color: var(--accent);
     }
 
-    /* Conteneur des exercices (masqué par défaut) */
     .accordion-content {
-      max-height: 0; /* Hauteur nulle pour masquer */
-      overflow: hidden; /* Cache le débordement */
-      transition: max-height 0.3s ease-out; /* Animation fluide */
-      background-color: #0f172a; /*slate-900 un peu plus sombre*/
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #0f172a;
     }
 
-    /* Style des items exercices à l'intérieur */
     .accordion-content .exercise-item {
-      padding: 10px 15px 10px 30px; /* Indentation à gauche */
+      padding: 10px 15px 10px 30px;
       font-size: 0.85rem;
       color: #cbd5e1;
       cursor: pointer;
@@ -232,7 +227,6 @@
       color: #fff;
     }
 
-    /* Style de l'exercice sélectionné */
     .accordion-content .exercise-item.active {
       background-color: #1e293b;
       color: var(--accent);
@@ -240,9 +234,8 @@
       font-weight: 500;
     }
 
-    /* Numéro de l'exercice (ExerciceX) */
     .ex-number {
-      color: #576b81; /* slate-500 sombre */
+      color: #576b81;
       margin-right: 8px;
       font-family: monospace;
       font-size: 0.8rem;
@@ -253,7 +246,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto; /* Scroll global de la zone droite */
+      overflow-y: auto;
       background-color: var(--bg-main);
     }
 
@@ -275,7 +268,6 @@
       flex-shrink: 0;
     }
 
-    /* BARRE D'OUTILS ÉDITEUR */
     .toolbar {
       display: flex;
       gap: 8px;
@@ -289,7 +281,7 @@
     }
 
     .tool-btn {
-      background-color: #334155; /* slate-700 */
+      background-color: #334155;
       border: 1px solid transparent;
       color: var(--text-main);
       padding: 5px 10px;
@@ -301,57 +293,70 @@
     .tool-btn:hover:not(:disabled) { background-color: #475569; border-color: var(--accent); }
     .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .run-btn { background-color: #0369a1; font-weight: bold; } /* sky-700 */
+    .run-btn { background-color: #0369a1; font-weight: bold; }
     .run-btn:hover:not(:disabled) { background-color: #0284c7; }
 
     .pyodide-status { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
 
-    /* ZONE DE CODE AVEC CORRECTIF SCROLL */
-    .editor-wrapper {
-      position: relative;
-      height: 350px; /* Hauteur fixe de l'éditeur */
-      border: 1px solid var(--border);
-      border-radius: 0 0 4px 4px;
-      overflow: hidden; /* Empêche le double scroll textarea/pre */
-    }
+ /* --- CORRECTION BARRES DE DÉFILEMENT (SCROLLBARS) --- */
 
-    /* Le wrapper qui gère le scroll unique pour textarea et pre */
-    .code-scroll-wrapper {
-      width: 100%;
-      height: 100%;
-      overflow: auto; /* Scroll unique ici */
-    }
+.editor-wrapper {
+  position: relative;
+  height: 380px; /* Ou la hauteur souhaitée */
+  border: 1px solid var(--border);
+  border-radius: 0 0 4px 4px;
+  background-color: #0f172a;
+  overflow: hidden; /* Empêche les débordements extérieurs */
+}
 
-    #code-input, #code-highlight {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 15px;
-      border: none;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 14px;
-      line-height: 1.5;
-      tab-size: 4;
-      white-space: pre; /* Important pour Prism */
-      overflow: hidden; /* Désactive scroll interne */
-    }
+/* Le conteneur de défilement unique */
+.code-scroll-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Active les barres de défilement H / V */
+}
 
-    #code-input {
-      color: transparent;
-      background: transparent;
-      caret-color: var(--accent); /* Couleur du curseur */
-      resize: none;
-      z-index: 2; /* Devant pour la saisie */
-    }
+/* Alignement parfait du Textarea et du rendu PrismJS */
+#code-input, #code-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 15px;
+  border: none;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 4;
+  white-space: pre; /* Conserve les espaces et lignes sans retour auto forcé */
+  word-wrap: normal;
+  box-sizing: border-box;
+}
 
-    #code-highlight {
-      z-index: 1; /* Derrière pour la coloration */
-      background-color: #0f172a; /* slate-900 standard */
-    }
+#code-input {
+  color: transparent;
+  background: transparent;
+  caret-color: var(--accent);
+  resize: none;
+  z-index: 2;
+  overflow: hidden; /* Laisse le défilement au wrapper parent */
+}
 
-    /* CONSOLE DE SORTIE */
+#code-highlight {
+  z-index: 1;
+  background-color: transparent;
+  pointer-events: none; /* Laisse traverser les clics vers le textarea */
+}
+
+#code-highlight code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
     .console-box {
       margin-top: 15px;
       background-color: #000;
@@ -372,10 +377,9 @@
       min-height: 40px;
     }
 
-    /* SECTION BASSE (ONGLETS) */
     .bottom-section {
       padding: 20px;
-      flex: 1; /* Prend le reste de la hauteur */
+      flex: 1;
       display: flex;
       flex-direction: column;
       min-height: 200px;
@@ -398,6 +402,14 @@
     .tab-content { display: none; padding: 20px 0; flex: 1; overflow-y: auto;}
     .tab-content.active { display: block; }
     .tab-content p { line-height: 1.6; color: #cbd5e1; font-size: 0.9rem;}
+
+    /* Désactive la sélection de texte sur le composant d'affichage Prism */
+#code-highlight, #code-block {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+}
   </style>
 </head>
 <body>
@@ -427,7 +439,6 @@
           <a class="back-link" onclick="showChaptersList()">← Retour aux chapitres</a>
           <h3 id="current-chapter-title" style="margin-top: 8px; color:#38bdf8; font-size:0.95rem;">Chapitre</h3>
         </div>
-        <!-- Menu accordéon dynamique JS -->
         <div class="exercise-accordion" id="exercise-accordion">
             <p style="color: #64748b; padding: 15px; font-size:0.85rem;">Chargement des exercices...</p>
         </div>
@@ -452,9 +463,9 @@
             <span style="color: #334155;">|</span>
             <button class="tool-btn" onclick="undoCode()">↶ Annuler</button>
             <button class="tool-btn" onclick="redoCode()">↷ Rétablir</button>
-            <button class="tool-btn" onclick="copyCode()">✂️ Copier</button>
-            <button class="tool-btn" onclick="pasteCode()">📋 Coller</button>
-            <button class="tool-btn" onclick="resetSolution()">🔄 RAZ</button>
+            <!--<button class="tool-btn" onclick="copyCode()">✂️ Copier</button>
+            <button class="tool-btn" onclick="pasteCode()">📋 Coller</button>-->
+            <button class="tool-btn" onclick="resetSolution()">🔄 Réinitialiser</button>
             <span style="color: #334155;">|</span>
             <label style="color:#94a3b8; font-size:0.8rem;" for="theme-select">🎨 Thème :</label>
             <select id="theme-select" class="tool-btn" style="padding: 2px 5px;" onchange="changeTheme(this.value)">
@@ -469,7 +480,7 @@
             <span class="pyodide-status" id="pyodide-status">⚡ Chargement Python...</span>
           </div>
 
-          <!-- Zone d'édition avec correctif scroll -->
+          <!-- Zone d'édition -->
           <div class="editor-wrapper">
             <div class="code-scroll-wrapper">
                 <textarea id="code-input" spellcheck="false" oninput="updateEditor()" onkeydown="handleTab(event)"></textarea>
@@ -487,8 +498,8 @@
         <!-- 3. SECTION BASSE : EXPLICATION & SIMULATION -->
         <div class="bottom-section">
           <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('explanation')">💡 Explication de la solution</button>
-            <button class="tab-btn" onclick="switchTab('simulation')">⚙️ Simulation interactive</button>
+            <button class="tab-btn active" id="btn-tab-explanation" onclick="switchTab('explanation')">💡 Explication de la solution</button>
+            <button class="tab-btn" id="btn-tab-simulation" onclick="switchTab('simulation')">⚙️ Simulation interactive</button>
           </div>
 
           <!-- Onglet 1 : Explication -->
@@ -501,7 +512,7 @@
           <!-- Onglet 2 : Simulation -->
           <div id="tab-simulation" class="tab-content">
             <div id="simulation-body">
-              <p style="color: #94a3b8; font-style:italic;">Aucune simulation interactive spécifique n'est disponible pour cet exercice. Utilisez l'éditeur de code ci-dessus pour tester des variantes.</p>
+              <p style="color: #94a3b8; font-style:italic;">Aucune simulation interactive spécifique n'est disponible pour cet exercice.</p>
             </div>
           </div>
         </div>
@@ -511,7 +522,7 @@
   </main>
 
   <footer>
-    Contenu pédagogique réservé — Reproduction interdite — Pyodide local © 2024
+    Contenu pédagogique réservé — Reproduction interdite — Pyodide local © 2026
   </footer>
 
   <!-- PrismJS local -->
@@ -521,101 +532,121 @@
   <script>
     /* --- SCRIPT JAVASCRIPT COMPLET --- */
 
-    /* VARIABLES GLOBALES */
-    let db = []; // Stockage local des données BDD
+    let db = [];
     let pyodideInstance = null;
     let currentChapter = null;
     let currentExercise = null;
     
-    // Pile pour l'historique de l'éditeur (Undo/Redo)
     let historyStack = [];
     let historyStep = -1;
 
-    /* ÉLÉMENTS DOM RÉCURRENTS */
     const textarea = document.getElementById('code-input');
     const codeBlock = document.getElementById('code-block');
 
-    /* INITIALISATION AU CHARGEMENT */
     window.onload = () => {
-      // 1. Vérification accès (simple sécurité locale)
-      if (localStorage.getItem('access_granted') !== 'true') {
-         // window.location.href = 'index.html'; // Rediriger si pas d'accès
-         console.log("Accès non vérifié (désactivé pour démo)");
-      }
-
       loadSavedTheme();
-      loadExercisesFromDB(); // Fetch BDD PHP
-      initPyodide();        // Charge Wasm local
+      loadExercisesFromDB();
+      initPyodide();
     };
 
-    /* 1. CHARGEMENT DES DONNÉES (FETCH PHP/SQL) */
+    /* 1. CHARGEMENT DES DONNÉES DEPUIS LE SERVEUR */
     async function loadExercisesFromDB() {
       const container = document.getElementById('chapters-list');
-      container.innerHTML = '<p style="color: #94a3b8; text-align:center; grid-column: 1/-1;">⏳ Chargement des données depuis la base de données...</p>';
+      container.innerHTML = '<p style="color: #94a3b8; text-align:center; grid-column: 1/-1;">⏳ Chargement des données...</p>';
 
       try {
-        // Appelle le script PHP qui retourne le JSON complet
         const response = await fetch('get_exercises.php');
-
-        if (!response.ok) {
-          throw new Error(`Erreur serveur (Code ${response.status}). Assurez-vous d'utiliser un serveur web (Wamp/Xampp).`);
-        }
-
+        if (!response.ok) throw new Error(`Erreur serveur (Code ${response.status}).`);
         const data = await response.json();
-        console.log("Données BDD reçues :", data);
 
         if (Array.isArray(data) && data.length > 0) {
           db = data;
           renderChaptersGrille();
         } else {
-          container.innerHTML = '<p style="color: #f59e0b; text-align:center; grid-column: 1/-1;">⚠️ La base de données ne contient aucun chapitre ou exercice valide.</p>';
+          container.innerHTML = '<p style="color: #f59e0b; text-align:center; grid-column: 1/-1;">⚠️ Aucun exercice trouvé dans la base.</p>';
         }
-
       } catch (error) {
         console.error('Erreur fetch BDD :', error);
         container.innerHTML = `<div style="color: #f43f5e; text-align:center; grid-column: 1/-1; background:#1e293b; padding:20px; border-radius:8px;">
-                                ❌ Erreur de connexion à la base de données.<br>
-                                <small style="color:#64748b;">fetch('get_exercises.php') a échoué.</small><br><br>
-                                <small>${error.message}</small>
+                                ❌ Erreur de connexion au serveur.<br><small>${error.message}</small>
                               </div>`;
       }
     }
 
-    /* 2. INITIALISATION DE PYODIDE (LOCAL WASM) */
+    /* 2. INITIALISATION ET CHARGEMENT PYODIDE + NUMPY */
     async function initPyodide() {
       const statusEl = document.getElementById('pyodide-status');
       const consoleEl = document.getElementById('console-output');
-      const runBtn = document.getElementById('run-btn');
 
       try {
-        statusEl.textContent = '⚡ Initialisation Python...';
+        statusEl.textContent = '⚡ Chargement Pyodide...';
         
-        // Charge Pyodide depuis le dossier local ./pyodide/
         pyodideInstance = await loadPyodide({
           indexURL: "./pyodide/"
         });
 
-        // Configuration de stdin (input()) via prompt JS
+        // Configuration entrée utilisateur (input)
         pyodideInstance.setStdin({
           stdin: () => {
-            const result = window.prompt("Python demande une saisie utilisateur (input) :");
-            return result !== null ? result : ""; // Retourne chaîne vide si Annuler
+            const result = window.prompt("Saisie utilisateur Python (input) :");
+            return result !== null ? result : "";
           }
         });
 
         statusEl.textContent = '✅ Python 3 prêt (Offline)';
         statusEl.style.color = '#10b981';
-        consoleEl.textContent = 'Environnement Python prêt. Sélectionnez un exercice pour charger son corrigé.';
-        // Le bouton exécuter sera activé au chargement d'un exercice
+        consoleEl.textContent = 'Environnement Python prêt. Sélectionne un exercice pour exécuter du code.';
       } catch (err) {
-        statusEl.textContent = '❌ Erreur Pyodide local';
+        statusEl.textContent = '❌ Erreur Pyodide';
         statusEl.style.color = '#f43f5e';
-        consoleEl.textContent = 'Erreur lors du chargement des fichiers Pyodide locaux depuis le dossier ./pyodide/.\n' + err.message;
-        console.error(err);
+        consoleEl.textContent = 'Échec de l\'initialisation du moteur Python local.\n' + err.message;
       }
     }
 
-    /* 3. VUE 1 : AFFICHAGE DE LA GRILLE DES CHAPITRES */
+    /* 3. EXÉCUTION DU CODE PYTHON (AVEC AUTO-LOAD DE NUMPY ET PAQUETS) */
+    async function runPython() {
+      if (!pyodideInstance) return;
+
+      const consoleEl = document.getElementById('console-output');
+      const runBtn = document.getElementById('run-btn');
+      const statusEl = document.getElementById('pyodide-status');
+      const code = textarea.value;
+
+      runBtn.disabled = true;
+      consoleEl.style.color = '#e2e8f0';
+      consoleEl.textContent = "⏳ Exécution locale en cours...\n";
+
+      // Interception des sorties standard print()
+      pyodideInstance.setStdout({
+        batched: (text) => {
+          consoleEl.textContent += text + "\n";
+        }
+      });
+      pyodideInstance.setStderr({
+        batched: (text) => {
+          consoleEl.textContent += text + "\n";
+        }
+      });
+
+      try {
+        // Détection et chargement automatique si numpy est importé
+        if (code.includes('numpy') || code.includes('np.')) {
+          statusEl.textContent = '📦 Chargement de NumPy...';
+          await pyodideInstance.loadPackage("numpy");
+          statusEl.textContent = '✅ Python 3 prêt';
+        }
+
+        // Exécution synchrone/asynchrone du code
+        await pyodideInstance.runPythonAsync(code);
+      } catch (err) {
+        consoleEl.style.color = '#f43f5e';
+        consoleEl.textContent += "\n❌ Erreur d'exécution Python :\n" + err.message;
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    /* 4. AFFICHAGE DES CHAPITRES ET DE L'ACCORDÉON */
     function renderChaptersGrille() {
       const container = document.getElementById('chapters-list');
       container.innerHTML = '';
@@ -624,450 +655,310 @@
         const card = document.createElement('div');
         card.className = 'chapter-card';
         card.onclick = () => openChapter(chap.id);
-
-        // Compte les exercices dans la hiérarchie JSON
         const count = (chap.exercises && Array.isArray(chap.exercises)) ? chap.exercises.length : 0;
         
         card.innerHTML = `
           <h3>${chap.title}</h3>
-          <span class="badge">${count > 0 ? count + ' solution(s) disponible(s)' : 'Contenu à venir'}</span>
+          <span class="badge">${count > 0 ? count + ' solution(s)' : 'Vide'}</span>
         `;
-        
         container.appendChild(card);
       });
     }
 
-    /* 4. VUE 2 : OUVERTURE D'UN CHAPITRE (ESPACE DE TRAVAIL) */
     function openChapter(chapterId) {
-      // Trouve le chapitre correspondant dans les données
       currentChapter = db.find(c => c.id == chapterId);
       if (!currentChapter) return;
 
-      // Bascule l'affichage (animation CSS translateX)
       document.getElementById('chapters-view').style.display = 'none';
       document.getElementById('workspace-view').classList.add('active');
-      
-      // Met à jour les titres de l'espace de travail
       document.getElementById('current-chapter-title').textContent = currentChapter.title;
       
-      // Génère le menu accordéon
       renderExercisesAccordion();
       
-      // Charge le premier exercice par défaut s'il existe
       if (currentChapter.exercises && currentChapter.exercises.length > 0) {
         loadExercise(currentChapter.exercises[0].id);
-      } else {
-        showChapterEmptyState();
       }
     }
 
-    // Retour à la grille
     function showChaptersList() {
       document.getElementById('workspace-view').classList.remove('active');
       setTimeout(() => {
         document.getElementById('chapters-view').style.display = 'block';
-      }, 300); // Temps transition CSS
+      }, 300);
     }
 
-    /* 5. GÉNÉRATION DE L'ACCORDÉON DES EXERCICES (SIDEBAR) - AVEC CATÉGORIES & NUMÉROTATION GLOBALE */
     function renderExercisesAccordion() {
       const accordionContainer = document.getElementById('exercise-accordion');
-      accordionContainer.innerHTML = ''; // Vide le container
+      accordionContainer.innerHTML = '';
 
       if (!currentChapter || !currentChapter.exercises || currentChapter.exercises.length === 0) {
-        accordionContainer.innerHTML = '<p style="color: #94a3b8; padding:15px; font-size:0.85rem; font-style:italic;">Aucun exercice dans ce chapitre.</p>';
+        accordionContainer.innerHTML = '<p style="color: #94a3b8; padding:15px; font-size:0.85rem;">Aucun exercice disponible.</p>';
         return;
       }
 
-      // --- ÉTAPE 1 : Regrouper les exercices par catégorie ---
-      // Structure : { "Activité": [ex1, ex2], "Défi": [ex3], "Autres": [ex4] }
       const groupedExercises = currentChapter.exercises.reduce((acc, ex) => {
-        // SQL: categorie (Activité, Application rapide, Défi, Exercice)
-        const cat = ex.categorie || "Autres"; 
-        if (!acc[cat]) {
-          acc[cat] = [];
-        }
+        const cat = ex.categorie || "Exercices"; 
+        if (!acc[cat]) acc[cat] = [];
         acc[cat].push(ex);
         return acc;
       }, {});
 
-      // --- ÉTAPE 2 : Générer le HTML de l'accordéon ---
-      let globalExerciseNumber = 1; // Compteur pour Exercice1, Exercice2...
-
-      // Ordre de tri souhaité pour les catégories
+      let globalExerciseNumber = 1;
       const categoryOrder = ["Activité", "Application rapide", "Exercice", "Défi", "Autres"];
-      
-      // Trie les clés récupérées selon l'ordre défini
-      const sortedCategories = Object.keys(groupedExercises).sort((a, b) => {
-          let indexA = categoryOrder.indexOf(a);
-          let indexB = categoryOrder.indexOf(b);
-          if (indexA === -1) indexA = 99; // Catégories inconnues à la fin
-          if (indexB === -1) indexB = 99;
-          return indexA - indexB;
-      });
+      const sortedCategories = Object.keys(groupedExercises).sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b));
 
-      // Parcourt les catégories triées
       sortedCategories.forEach(category => {
         const exercises = groupedExercises[category];
         
-        // A. Créer le bouton de la catégorie (Header)
         const categoryHeader = document.createElement('button');
         categoryHeader.className = 'accordion-category';
-        categoryHeader.innerHTML = `
-          ${category} (${exercises.length})
-          <span class="category-icon">▼</span>
-        `;
+        categoryHeader.innerHTML = `${category} (${exercises.length}) <span class="category-icon">▼</span>`;
         
-        // B. Créer le conteneur du contenu (Content)
         const categoryContent = document.createElement('div');
         categoryContent.className = 'accordion-content';
 
-        // C. Ajouter les exercices dans le contenu
         exercises.forEach(ex => {
           const exerciseItem = document.createElement('div');
-          // Définit active si c'est l'ex courant
           const isActive = currentExercise && currentExercise.id === ex.id;
           exerciseItem.className = `exercise-item ${isActive ? 'active' : ''}`;
-          exerciseItem.id = `nav-${ex.id}`; // ID unique pour mise à jour rapide
+          exerciseItem.id = `nav-${ex.id}`;
 
-          // Construit le titre avec le numéro global EXEMPLE : "Exercice3 : Diviseurs"
-          exerciseItem.innerHTML = `
-            <span class="ex-number">Exercice${globalExerciseNumber}</span> 
-            <span class="ex-title">${ex.title}</span>
-          `;
-          
-          // Clic : charge l'exercice
+          exerciseItem.innerHTML = `<span class="ex-number">Ex${globalExerciseNumber}</span> <span class="ex-title">${ex.title}</span>`;
           exerciseItem.onclick = (e) => {
-              e.stopPropagation(); // Évite trigger clic header
-              loadExercise(ex.id);
+            e.stopPropagation();
+            loadExercise(ex.id);
           };
 
           categoryContent.appendChild(exerciseItem);
-          globalExerciseNumber++; // Incrémente le numéro pour le prochain
+          globalExerciseNumber++;
         });
 
-        // --- ÉTAPE 3 : Logique masquer/afficher (Masquer par défaut en CSS max-height:0) ---
         categoryHeader.onclick = function() {
-            // Tourne flèche
-            this.classList.toggle('active');
-            
-            const content = this.nextElementSibling;
-            if (content.style.maxHeight) {
-                // Ouvert -> Fermer
-                content.style.maxHeight = null;
-            } else {
-                // Fermé -> Ouvrir (calcul hauteur réelle)
-                content.style.maxHeight = content.scrollHeight + "px";
-                
-                // OPTIONNEL : Fermer les autres (mode accordéon strict)
-                /*
-                document.querySelectorAll('.accordion-category').forEach(h => {
-                    if (h !== this && h.classList.contains('active')) {
-                        h.classList.remove('active');
-                        h.nextElementSibling.style.maxHeight = null;
-                    }
-                });
-                */
-            }
+          this.classList.toggle('active');
+          const content = this.nextElementSibling;
+          content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
         };
 
-        // Ajoute au container principal
         accordionContainer.appendChild(categoryHeader);
         accordionContainer.appendChild(categoryContent);
         
-        // --- ÉTAPE 4 : Ouvrir automatiquement catégorie de l'exercice actif ---
         if (currentExercise && exercises.some(e => e.id === currentExercise.id)) {
-            categoryHeader.classList.add('active');
-            categoryContent.style.maxHeight = categoryContent.scrollHeight + "px";
+          categoryHeader.classList.add('active');
+          categoryContent.style.maxHeight = categoryContent.scrollHeight + "px";
         }
       });
       
-      // Si aucun ex chargé, ouvre première catégorie
       if (!currentExercise && accordionContainer.firstChild) {
-          accordionContainer.firstChild.click();
+        accordionContainer.firstChild.click();
       }
     }
 
-    /* 6. CHARGEMENT D'UN EXERCICE (MISE À JOUR ESPACE TRAVAIL) */
+    /* 5. CHARGEMENT ET RENDU D'UN EXERCICE */
     function loadExercise(exId) {
       currentExercise = currentChapter.exercises.find(e => e.id === exId);
       if (!currentExercise) return;
 
-      // --- A. GESTION ÉTAT ACTIF SIDEBAR (SANS RE-RENDER COMPLET) ---
-      // 1. Retire active partout
-      document.querySelectorAll('.accordion-content .exercise-item').forEach(item => {
-          item.classList.remove('active');
-      });
-      
-      // 2. Ajoute active à l'item cliqué (nav-ID)
+      document.querySelectorAll('.accordion-content .exercise-item').forEach(item => item.classList.remove('active'));
       const clickedItem = document.getElementById(`nav-${exId}`);
-      if (clickedItem) {
-          clickedItem.classList.add('active');
-          
-          // S'assurer que le parent est ouvert (cas appel externe)
-          const parentContent = clickedItem.closest('.accordion-content');
-          const parentHeader = parentContent.previousElementSibling;
-          if (!parentHeader.classList.contains('active')) {
-              parentHeader.click(); // Force ouverture
-          }
-      }
-      // -----------------------------------------------------------
+      if (clickedItem) clickedItem.classList.add('active');
 
-      // B. Mise à jour de l'énoncé et onglets bas
       document.getElementById('exercise-title').textContent = currentExercise.title;
-      // SQL: statement (text avec retours ligne \r\n gérés par pre-wrap ou conversion <br>)
       document.getElementById('exercise-body').innerHTML = currentExercise.statement; 
-      document.getElementById('explanation-body').innerHTML = currentExercise.explanation || "<i>Pas d'explication détaillée fournie.</i>";
+      document.getElementById('explanation-body').innerHTML = currentExercise.explanation || "<i>Aucune explication fournie.</i>";
       
       const simBody = document.getElementById('simulation-body');
-      // SQL: simulation_html (HTML brut ou NULL)
-      if (currentExercise.simulation_html && currentExercise.simulation_html.trim() !== "") {
-          simBody.innerHTML = currentExercise.simulation_html;
-          switchTab('explanation'); // Switch explic par défaut
+      
+      // Injection ou génération visuelle directe pour les cas PyQt5
+      if (currentChapter.id === 8 || (currentExercise.title && currentExercise.title.toLowerCase().includes("qt"))) {
+         simBody.innerHTML = `
+          <div style="background:#1e293b; padding:15px; border-radius:6px; border:1px solid #334155;">
+            <p style="color:#38bdf8; font-weight:bold; margin-bottom:10px;">🖥️ Rendu visuel simulé de l'interface GUI :</p>
+            <div style="background:#f8fafc; color:#0f172a; padding:15px; border-radius:4px; max-width:320px; font-family:sans-serif;">
+               <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px;">Champ de saisie (txt_saisie / txt_entree) :</label>
+               <input type="text" value="12" style="width:100%; padding:6px; border:1px solid #cbd5e1; border-radius:4px; margin-bottom:10px;" readonly>
+               <button style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;" onclick="alert('Simulation du Signal PyQt5 : clicked.connect(action_bouton)')">Exécuter le Bouton (btn_reset)</button>
+               <div style="margin-top:10px; font-size:13px; font-weight:bold; color:#0369a1;">Étiquette (lbl_message) : <span style="color:#15803d;">Bienvenue</span></div>
+            </div>
+          </div>`;
+      } else if (currentExercise.simulation_html && currentExercise.simulation_html.trim() !== "") {
+        simBody.innerHTML = currentExercise.simulation_html;
       } else {
-          simBody.innerHTML = "<p style='color: #64748b; font-style:italic;'>Aucune simulation interactive spécifique n'est disponible pour cet exercice. Testez des variantes directement dans l'éditeur.</p>";
-          switchTab('explanation');
+        simBody.innerHTML = "<p style='color: #64748b; font-style:italic;'>Utilisez l'éditeur pour exécuter directement le code et observer ses sorties console.</p>";
       }
       
-      // C. Charger le code dans le textarea et RÉINITIALISER L'HISTORIQUE
+      switchTab('explanation');
+
       textarea.value = currentExercise.code;
-      
-      // Pile historique RAZ pour ce nouvel exercice
       historyStack = [currentExercise.code];
       historyStep = 0;
 
-      // D. Mettre à jour l'affichage PrismJS (coloration)
       updatePrismDisplay();
 
-      // E. UI State
       if (pyodideInstance) {
-          document.getElementById('run-btn').disabled = false;
+        document.getElementById('run-btn').disabled = false;
       }
-      document.getElementById('console-output').textContent = "Corrigé chargé. Cliquez sur 'Exécuter le code' pour voir le résultat.";
+      document.getElementById('console-output').textContent = "Corrigé chargé. Cliquez sur 'Exécuter le code' pour lancer l'interprète.";
       document.getElementById('console-output').style.color = "#e2e8f0";
     }
 
-    function showChapterEmptyState() {
-      currentExercise = null;
-      document.getElementById('exercise-title').textContent = "Solutions à venir";
-      document.getElementById('exercise-body').innerHTML = "<p style='color: #94a3b8;'>Les corrigés pour ce chapitre seront bientôt disponibles.</p>";
-      document.getElementById('explanation-body').innerHTML = "Contenu en cours de rédaction.";
-      document.getElementById('simulation-body').innerHTML = "Pas de simulation.";
-      textarea.value = "# Solutions bientôt disponibles\nprint('Sélectionnez un autre chapitre.')";
-      updatePrismDisplay();
-      document.getElementById('run-btn').disabled = true;
-    }
-
-    /* 7. GESTION DE L'ÉDITEUR : SYNTAX HIGHLIGHT, TAB & HISTORIQUE */
-    
-    // Fonction centrale pour colorer le code (PrismJS)
+    /* 6. OUTILS DE L'ÉDITEUR ET HISTORIQUE */
     function updatePrismDisplay() {
-        if (!textarea || !codeBlock) return;
-        let content = textarea.value;
-        // Prism ignore la dernière ligne si vide, on ajoute un espace
-        if (content[content.length - 1] === "\n") content += " ";
-        
-        codeBlock.textContent = content;
-
-        if (window.Prism) {
-            Prism.highlightElement(codeBlock); // Applique coloration
-        }
+      if (!textarea || !codeBlock) return;
+      let content = textarea.value;
+      if (content[content.length - 1] === "\n") content += " ";
+      codeBlock.textContent = content;
+      if (window.Prism) Prism.highlightElement(codeBlock);
     }
 
-    // Appelé par oninput="" dans le HTML (frappe utilisateur)
     function updateEditor() {
       updatePrismDisplay();
-      saveState(textarea.value); // Enregistre dans l'historique après frappe
+      saveState(textarea.value);
     }
 
-    // Sauvegarde local du thème
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const codeArea = document.getElementById('code-input');
+  const editorWrapper = document.querySelector('.editor-wrapper');
+
+  if (codeArea) {
+    // 1. Bloquer la copie (Ctrl+C, Cmd+C, menu contextuel Copier)
+    codeArea.addEventListener('copy', (e) => {
+      e.preventDefault();
+      alert("La copie du code est désactivée pour cet exercice. Réécrivez le code manuellement !");
+    });
+
+    // 2. Bloquer le menu contextuel (clic droit) spécifiquement sur l'éditeur
+    codeArea.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // 3. Bloquer le glisser-déposer de texte (Drag and Drop) vers/depuis l'éditeur
+    codeArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+    });
+    
+    codeArea.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+  }
+
+  // 4. Bloquer la combinaison de touches Ctrl+C / Cmd+C quand l'utilisateur est dans l'éditeur
+  document.addEventListener('keydown', (e) => {
+    const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c';
+    if (isCopyShortcut && document.activeElement === codeArea) {
+      e.preventDefault();
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+    function handleTab(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        textarea.value = textarea.value.substring(0, start) + "    " + textarea.value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 4;
+        updateEditor();
+      }
+    }
+
+    function saveState(val) {
+      if (historyStep < historyStack.length - 1) {
+        historyStack = historyStack.slice(0, historyStep + 1);
+      }
+      historyStack.push(val);
+      historyStep++;
+    }
+
+    function undoCode() {
+      if (historyStep > 0) {
+        historyStep--;
+        textarea.value = historyStack[historyStep];
+        updatePrismDisplay();
+      }
+    }
+
+    function redoCode() {
+      if (historyStep < historyStack.length - 1) {
+        historyStep++;
+        textarea.value = historyStack[historyStep];
+        updatePrismDisplay();
+      }
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText(textarea.value);
+      alert("Code copié dans le presse-papier !");
+    }
+
+    async function pasteCode() {
+      const text = await navigator.clipboard.readText();
+      textarea.value = text;
+      updateEditor();
+    }
+
+    function resetSolution() {
+      if (currentExercise) {
+        textarea.value = currentExercise.code;
+        updateEditor();
+      }
+    }
+
+    /* 7. THÈMES ET NAVEGATION ONGLET */
     function loadSavedTheme() {
       const savedTheme = localStorage.getItem('editor_theme') || 'tomorrownight';
       document.getElementById('theme-select').value = savedTheme;
       changeTheme(savedTheme);
     }
 
-    // Change thème Prism dynamiquement
     function changeTheme(themeName) {
       const themeLink = document.getElementById('prism-theme');
-      let themeFile = `./assets/prism/prism-${themeName}.min.css`;
-      if (themeName === 'default') themeFile = `./assets/prism/prism.min.css`;
-
-      themeLink.setAttribute('href', themeFile);
-      localStorage.setItem('editor_theme', themeName); // Sauvegarde choix
-
-      setTimeout(updatePrismDisplay, 50); // Recalcule Prism après chargement CSS
+      themeLink.href = `./assets/prism/prism-${themeName}.min.css`;
+      localStorage.setItem('editor_theme', themeName);
     }
 
-    // Gère indentation touche Tab (4 espaces)
-    function handleTab(e) {
-      if (e.key === 'Tab') {
-        e.preventDefault(); // Empêche perte focus
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        // Insère 4 espaces
-        textarea.value = textarea.value.substring(0, start) + "    " + textarea.value.substring(end);
-        // Replace curseur
-        textarea.selectionStart = textarea.selectionEnd = start + 4;
-        updateEditor(); // Update display + histoire
-      }
-    }
-
-    /* 8. LOGIQUE UNDO / REDO (CORRIGÉE) */
-    
-    function saveState(val) {
-      // Ne pas enregistrer si valeur identique à l'étape actuelle
-      if (historyStep >= 0 && historyStack[historyStep] === val) return;
-
-      // Si on écrit après des Undo, supprime la branche "Redo" future
-      if (historyStep < historyStack.length - 1) {
-        historyStack = historyStack.slice(0, historyStep + 1);
-      }
-      
-      // Ajoute à la pile
-      historyStack.push(val);
-      historyStep++;
-      
-      // Limite pile (optionnel)
-      if (historyStack.length > 100) {
-          historyStack.shift();
-          historyStep--;
-      }
-    }
-
-    function undoCode() { 
-      if (historyStep > 0) { 
-        historyStep--; 
-        textarea.value = historyStack[historyStep]; 
-        updatePrismDisplay(); // Update display SANS saveState()
-        textarea.focus();
-      } 
-    }
-
-    function redoCode() { 
-      if (historyStep < historyStack.length - 1) { 
-        historyStep++; 
-        textarea.value = historyStack[historyStep]; 
-        updatePrismDisplay(); // Update display SANS saveState()
-        textarea.focus();
-      } 
-    }
-
-    /* 9. EXÉCUTION DU CODE AVEC PYODIDE (WASM LOCAL) */
-    async function runPython() {
-      if (!pyodideInstance) {
-        alert("L'environnement Python (local) est en cours de chargement...");
-        return;
-      }
-
-      const consoleEl = document.getElementById('console-output');
-      const runBtn = document.getElementById('run-btn');
-      
-      // UI State
-      consoleEl.textContent = "⏳ Exécution locale en cours...\n";
-      consoleEl.style.color = "#e2e8f0";
-      runBtn.innerHTML = "<span>⏳</span> En cours...";
-      runBtn.disabled = true;
-
-      try {
-        // Redirection stdout (print())
-        pyodideInstance.setStdout({
-          batched: (text) => {
-            consoleEl.textContent += text + "\n";
-            consoleEl.scrollTop = consoleEl.scrollHeight; // Scroll auto bottom
-          }
-        });
-
-        // Redirection stderr (erreurs)
-        pyodideInstance.setStderr({
-          batched: (text) => {
-            consoleEl.textContent += text + "\n";
-            consoleEl.style.color = "#f43f5e"; // Rouge errors
-          }
-        });
-
-        // Exécution asynchrone
-        await pyodideInstance.runPythonAsync(textarea.value);
-
-        // Si aucune sortie printed
-        if (consoleEl.textContent === "⏳ Exécution locale en cours...\n") {
-          consoleEl.textContent += "➡️ Code exécuté avec succès (aucune sortie imprimée).";
-        } else if (!consoleEl.style.color.includes('f43f5e')) {
-             consoleEl.textContent += "\n✅ Terminé.";
-        }
-        
-      } catch (err) {
-        // Erreurs Python (Syntax, Type, etc.)
-        consoleEl.textContent += "\n❌ Erreur d'exécution Python :\n" + err.message;
-        consoleEl.style.color = "#f43f5e";
-      } finally {
-        // UI State reset
-        runBtn.innerHTML = "<span>▶</span> Exécuter le code";
-        runBtn.disabled = false;
-      }
-    }
-
-    /* 10. OUTILS ÉDITEUR (COPIER, RAZ) */
-    
-    function copyCode() {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      // Sélection ou tout le code
-      const textToCopy = (start !== end) ? textarea.value.substring(start, end) : textarea.value;
-
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        // Notif visuelle temporaire sur le bouton
-        const btn = document.querySelector('[onclick="copyCode()"]');
-        const original = btn.innerHTML;
-        btn.innerHTML = "✅ Copié !";
-        setTimeout(() => btn.innerHTML = original, 1200);
-      }).catch(err => {
-        alert("Erreur lors de la copie : " + err);
-      });
-    }
-
-    async function pasteCode() {
-      try {
-        const textToPaste = await navigator.clipboard.readText();
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-
-        // Insère au curseur
-        textarea.value = textarea.value.substring(0, start) + textToPaste + textarea.value.substring(end);
-        // Replace curseur après
-        textarea.selectionStart = textarea.selectionEnd = start + textToPaste.length;
-        
-        textarea.focus();
-        updateEditor(); // Force Prism + histoire
-      } catch (err) {
-        alert("Impossible d'accéder au presse-papier.\nVérifiez les permissions du navigateur.");
-      }
-    }
-
-    function resetSolution() { 
-      if (currentExercise && confirm("Annuler vos modifications et restaurer le corrigé original ?")) { 
-        textarea.value = currentExercise.code;
-        updateEditor(); // Save comme nouvel état
-      } 
-    }
-
-    /* 11. GESTION ONGLETS & DÉCONNEXION */
     function switchTab(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-      if (tabName === 'explanation') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('tab-explanation').classList.add('active');
-      } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('tab-simulation').classList.add('active');
-      }
+      document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
     }
 
     function logout() {
       localStorage.removeItem('access_granted');
-      window.location.href = 'index.html';
+      alert("Déconnexion réussie.");
+      window.location.reload();
     }
   </script>
 </body>
