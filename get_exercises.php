@@ -2,7 +2,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 $host = 'localhost';
-$dbname = 'solutions_python'; // ⚠️ Vérifiez le nom de votre BDD
+$dbname = 'solutions_python';
 $username = 'root';
 $password = '';
 
@@ -18,15 +18,14 @@ try {
 
     $db = [];
     foreach ($chapters as $chap) {
-        // Récupérer les exercices du chapitre
-        $stmtEx = $pdo->prepare("SELECT id, title, statement, code, explanation, simulation_html AS simulationHtml 
+        // ✅ CORRECTION ICI : "simulation_html" sans alias AS simulationHtml
+        $stmtEx = $pdo->prepare("SELECT id, title, statement, code, explanation, simulation_html 
                                  FROM exercises 
                                  WHERE chapter_id = ? 
                                  ORDER BY id ASC");
         $stmtEx->execute([$chap['id']]);
         $exercises = $stmtEx->fetchAll();
 
-        // Si $exercises est faux/null, on met un tableau vide []
         $db[] = [
             'id' => (int)$chap['id'],
             'title' => $chap['title'],

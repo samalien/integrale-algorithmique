@@ -222,7 +222,69 @@
     }
 
     /* 5. CHARGEMENT ET RENDU D'UN EXERCICE */
+    /* 5. CHARGEMENT ET RENDU D'UN EXERCICE */
     function loadExercise(exId) {
+      currentExercise = currentChapter.exercises.find(e => e.id === exId);
+      if (!currentExercise) return;
+
+      document.querySelectorAll('.accordion-content .exercise-item').forEach(item => item.classList.remove('active'));
+      const clickedItem = document.getElementById(`nav-${exId}`);
+      if (clickedItem) clickedItem.classList.add('active');
+
+      document.getElementById('exercise-title').textContent = currentExercise.title;
+      document.getElementById('exercise-body').innerHTML = currentExercise.statement; 
+      document.getElementById('explanation-body').innerHTML = currentExercise.explanation || "<i>Aucune explication fournie.</i>";
+      
+      const simBody = document.getElementById('simulation-body');
+      
+      // A. Si une simulation HTML spécifique existe en BDD (ex: C01_EX01)
+      if (currentExercise.simulation_html && currentExercise.simulation_html.trim() !== "" && currentExercise.simulation_html !== "NULL") {
+        
+        // 1. Injecter le squelette HTML
+        simBody.innerHTML = currentExercise.simulation_html;
+
+        // 2. Ré-exécuter manuellement les balises <script> injectées
+        const scripts = simBody.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement('script');
+          Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+          newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+
+      // B. Cas particulier du Chapitre 8 (Qt / GUI) si aucune simulation spécifique n'est définie
+      } else if (currentChapter.id === 8 || (currentExercise.title && currentExercise.title.toLowerCase().includes("qt"))) {
+         simBody.innerHTML = `
+          <div style="background:#1e293b; padding:15px; border-radius:6px; border:1px solid #334155;">
+            <p style="color:#38bdf8; font-weight:bold; margin-bottom:10px;">🖥️ Rendu visuel simulé de l'interface GUI :</p>
+            <div style="background:#f8fafc; color:#0f172a; padding:15px; border-radius:4px; max-width:320px; font-family:sans-serif;">
+               <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px;">Champ de saisie (txt_saisie / txt_entree) :</label>
+               <input type="text" value="12" style="width:100%; padding:6px; border:1px solid #cbd5e1; border-radius:4px; margin-bottom:10px;" readonly>
+               <button style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;" onclick="alert('Simulation du Signal PyQt5 : clicked.connect(action_bouton)')">Exécuter le Bouton (btn_reset)</button>
+               <div style="margin-top:10px; font-size:13px; font-weight:bold; color:#0369a1;">Étiquette (lbl_message) : <span style="color:#15803d;">Bienvenue</span></div>
+            </div>
+          </div>`;
+
+      // C. Message par défaut si pas de simulation
+      } else {
+        simBody.innerHTML = "<p style='color: #64748b; font-style:italic;'>Utilisez l'éditeur pour exécuter directement le code et observer ses sorties console.</p>";
+      }
+      
+      switchTab('explanation');
+
+      textarea.value = currentExercise.code;
+      historyStack = [currentExercise.code];
+      historyStep = 0;
+
+      updatePrismDisplay();
+
+      if (pyodideInstance) {
+        document.getElementById('run-btn').disabled = false;
+      }
+      document.getElementById('console-output').textContent = "Corrigé chargé. Cliquez sur 'Exécuter le code' pour lancer l'interprète.";
+      document.getElementById('console-output').style.color = "#e2e8f0";
+    }
+   /* function loadExercise(exId) {
       currentExercise = currentChapter.exercises.find(e => e.id === exId);
       if (!currentExercise) return;
 
@@ -267,7 +329,7 @@
       }
       document.getElementById('console-output').textContent = "Corrigé chargé. Cliquez sur 'Exécuter le code' pour lancer l'interprète.";
       document.getElementById('console-output').style.color = "#e2e8f0";
-    }
+    }*/
 
     /* 6. OUTILS DE L'ÉDITEUR ET HISTORIQUE */
     function updatePrismDisplay() {
