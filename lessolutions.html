@@ -25,7 +25,7 @@
     <div id="chapters-view">
       <div class="welcome">
         <h2>Bienvenue dans votre Espace Solutions</h2>
-        <p>Sélectionnez un chapitre pour accéder aux exercices. Vous pourrez visualiser les corrigés, lire les explications et exécuter le code Python réel en local grâce à Pyodide (Wasm).</p>
+        <p>Sélectionnez un chapitre pour accéder aux exercices. Vous pourrez visualiser les corrigés, lire les explications et exécuter le code Python réel en local.</p>
       </div>
 
       <div id="chapters-list">
@@ -91,7 +91,7 @@
 
           <!-- Console de sortie Python -->
           <div class="console-box">
-            <div class="console-title">Console de sortie Python (Pyodide Wasm) :</div>
+            <div class="console-title">Console de sortie Python  :</div>
             <pre id="console-output">Sélectionnez un exercice pour charger le code corrigé.</pre>
           </div>
         </div>
@@ -127,6 +127,8 @@
   </footer>
 <script>
 
+// Remplace le texte de la barre d'adresse sans recharger la page
+window.history.pushState({}, '', '/solutions');
 
 document.addEventListener('DOMContentLoaded', () => {
   const codeArea = document.getElementById('code-input');
